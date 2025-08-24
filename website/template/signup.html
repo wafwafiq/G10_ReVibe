@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - ReVibe{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <h2 class="auth-title">Join ReVibe</h2>
+    <p class="auth-subtitle">Create your MMU marketplace account</p>
+    
+    <form method="POST" id="signupForm">
+        <div class="form-group">
+            <label for="fullName" class="form-label">Full Name</label>
+            <input 
+                type="text" 
+                id="fullName" 
+                name="fullName" 
+                class="form-input" 
+                placeholder="Enter your full name"
+                required
+            >
+            <div class="error-message" id="fullNameError"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="username" class="form-label">Username</label>
+            <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                class="form-input" 
+                placeholder="Choose a unique username"
+                required
+            >
+            <div class="error-message" id="usernameError"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="email" class="form-label">MMU Email Address</label>
+            <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                class="form-input" 
+                placeholder="yourname@student.mmu.edu.my"
+                required
+            >
+            <div class="error-message" id="emailError"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                class="form-input" 
+                placeholder="Create a strong password"
+                required
+            >
+            <div class="error-message" id="passwordError"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="confirmPassword" class="form-label">Confirm Password</label>
+            <input 
+                type="password" 
+                id="confirmPassword" 
+                name="confirmPassword" 
+                class="form-input" 
+                placeholder="Confirm your password"
+                required
+            >
+            <div class="error-message" id="confirmPasswordError"></div>
+        </div>
+        
+        <button type="submit" class="btn">
+            <span id="signupText">Create Account</span>
+            <span id="signupLoading" class="loading" style="display: none;"></span>
+        </button>
+    </form>
+    
+    <a href="{{ url_for('auth.login') }}" class="auth-link">
+        Already have an account? Sign in here
+    </a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Form validation for signup
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+        const fullName = document.getElementById('fullName');
+        const username = document.getElementById('username');
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirmPassword');
+        let isValid = true;
+        
+        // Clear previous errors
+        document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+        document.querySelectorAll('.form-input').forEach(el => el.classList.remove('error', 'success'));
+        
+        // Full name validation
+        if (fullName.value.trim().length < 2) {
+            document.getElementById('fullNameError').textContent = 'Please enter your full name';
+            fullName.classList.add('error');
+            isValid = false;
+        } else {
+            fullName.classList.add('success');
+        }
+        
+        // Username validation
+        if (username.value.length < 3 || !/^[a-zA-Z0-9_]+$/.test(username.value)) {
+            document.getElementById('usernameError').textContent = 'Username must be 3+ characters, alphanumeric and underscore only';
+            username.classList.add('error');
+            isValid = false;
+        } else {
+            username.classList.add('success');
+        }
+        
+        // Email validation (MMU domain)
+        if (!email.value.includes('@student.mmu.edu.my') && !email.value.includes('@mmu.edu.my')) {
+            document.getElementById('emailError').textContent = 'Please use your MMU email address (@student.mmu.edu.my or @mmu.edu.my)';
+            email.classList.add('error');
+            isValid = false;
+        } else {
+            email.classList.add('success');
+        }
+        
+        // Password validation
+        if (password.value.length < 8) {
+            document.getElementById('passwordError').textContent = 'Password must be at least 8 characters';
+            password.classList.add('error');
+            isValid = false;
+        } else {
+            password.classList.add('success');
+        }
+        
+        // Confirm password validation
+        if (password.value !== confirmPassword.value) {
+            document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
+            confirmPassword.classList.add('error');
+            isValid = false;
+        } else if (confirmPassword.value.length > 0) {
+            confirmPassword.classList.add('success');
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+        } else {
+            // Show loading state
+            document.getElementById('signupText').style.display = 'none';
+            document.getElementById('signupLoading').style.display = 'inline-block';
+        }
+    });
+    
+    // Real-time password matching
+    document.getElementById('confirmPassword').addEventListener('input', function() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = this.value;
+        const errorEl = document.getElementById('confirmPasswordError');
+        
+        if (confirmPassword.length > 0) {
+            if (password !== confirmPassword) {
+                errorEl.textContent = 'Passwords do not match';
+                this.classList.add('error');
+                this.classList.remove('success');
+            } else {
+                errorEl.textContent = '';
+                this.classList.remove('error');
+                this.classList.add('success');
+            }
+        }
+    });
+</script>
+{% endblock %}
