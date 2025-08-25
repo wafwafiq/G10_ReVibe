@@ -438,6 +438,15 @@ body {
     font-weight: 500;
 }
 
+/* Form notes and helper text */
+.form-note {
+    display: block;
+    color: var(--medium-gray);
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+    font-style: italic;
+}
+
 /* Dashboard Specific Styles */
 .dashboard {
     padding: 0;
