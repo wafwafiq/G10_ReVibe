@@ -34,7 +34,7 @@
     <div class="quick-actions">
         <h2 class="section-title">Quick Actions</h2>
         <div class="action-grid">
-            <a href="{{ url_for('views.create_post') }}" class="action-card">
+            <a href="{{ url_for('views.posts') }}" class="action-card">
                 <div class="action-icon">📝</div>
                 <h3>Sell an Item</h3>
                 <p>List your item for sale or exchange</p>
@@ -68,45 +68,31 @@
     <div class="recent-activity">
         <h2 class="section-title">Recent Listings</h2>
         <div class="activity-list">
-            <div class="activity-item">
-                <div class="activity-icon">📱</div>
-                <div class="activity-content">
-                    <h4>iPhone 13 Pro</h4>
-                    <p>Electronics • RM 2,500 • Posted by @john_doe</p>
-                    <span class="activity-time">2 hours ago</span>
+            <!-- Dynamic content - Wafiq will replace this with database data -->
+            {% if recent_items %}
+                {% for item in recent_items %}
+                <div class="activity-item">
+                    <div class="activity-icon">{{ item.icon or '📦' }}</div>
+                    <div class="activity-content">
+                        <h4>{{ item.name }}</h4>
+                        <p>{{ item.category }} • RM {{ item.price }} • Posted by @{{ item.seller }}</p>
+                        <span class="activity-time">{{ item.time_ago }}</span>
+                    </div>
+                    <div class="activity-status {{ item.status }}">{{ item.status.title() }}</div>
                 </div>
-                <div class="activity-status active">Active</div>
-            </div>
-            
-            <div class="activity-item">
-                <div class="activity-icon">📚</div>
-                <div class="activity-content">
-                    <h4>Programming Textbooks</h4>
-                    <p>Books • RM 150 • Posted by @sarah_mmu</p>
-                    <span class="activity-time">5 hours ago</span>
+                {% endfor %}
+            {% else %}
+                <!-- Fallback content when no items exist -->
+                <div class="activity-item">
+                    <div class="activity-icon">📦</div>
+                    <div class="activity-content">
+                        <h4>Welcome to ReVibe!</h4>
+                        <p>No items posted yet. Be the first to list something!</p>
+                        <span class="activity-time">Start selling today</span>
+                    </div>
+                    <div class="activity-status active">Ready</div>
                 </div>
-                <div class="activity-status active">Active</div>
-            </div>
-            
-            <div class="activity-item">
-                <div class="activity-icon">🎮</div>
-                <div class="activity-content">
-                    <h4>PS5 Controller</h4>
-                    <p>Gaming • RM 200 • Posted by @gamer_alex</p>
-                    <span class="activity-time">1 day ago</span>
-                </div>
-                <div class="activity-status sold">Sold</div>
-            </div>
-            
-            <div class="activity-item">
-                <div class="activity-icon">👕</div>
-                <div class="activity-content">
-                    <h4>MMU Hoodie</h4>
-                    <p>Clothing • RM 80 • Posted by @mmu_student</p>
-                    <span class="activity-time">2 days ago</span>
-                </div>
-                <div class="activity-status active">Active</div>
-            </div>
+            {% endif %}
         </div>
         
         <div class="view-all">
