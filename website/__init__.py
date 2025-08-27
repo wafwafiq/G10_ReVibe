@@ -7,10 +7,13 @@ login_manager = LoginManager()
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = '123' # username and password and local host for database#
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://USERNAME:PASS@localhost/database'
+    # MySQL connection (replace password with yours)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:ogezuJ4qNR7Jk9Mb@localhost/revibe'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.secret_key = "your_secret_key"  # needed for sessions
 
     db.init_app(app)
+    
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
 
