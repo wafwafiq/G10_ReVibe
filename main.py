@@ -1,4 +1,5 @@
 from flask import Flask
+from website import create_app
 from website.models import db, User   # import db + User model
 
 app = Flask(__name__)
