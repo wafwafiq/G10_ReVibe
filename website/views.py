@@ -9,19 +9,19 @@ def home():
 
 @views.route('/posts')
 def posts():
-    return render_template('main.html')
+    return ('posts page')
 
 @views.route('/catalog')
 def catalog():
-    return render_template('main.html')
+    return ('catalog page')
 
 @views.route('/map')
 def map():
-    return render_template('main.html')
+    return ('map page')
 
 @views.route('/chat')
 def chats():
-    return render_template('main.html')
+    return ('chat page')
 
 @views.route('/users')
 def lists_users():
