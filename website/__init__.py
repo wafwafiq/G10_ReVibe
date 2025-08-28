@@ -5,9 +5,9 @@ from flask_login import LoginManager
 db = SQLAlchemy()
 login_manager = LoginManager()
 
-def create_app():
+def create_app(): 
     app = Flask(__name__)
-    # MySQL connection
+    # MySQL code from main moved to init
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:ogezuJ4qNR7Jk9Mb@localhost/revibe'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.secret_key = "your_secret_key"
@@ -29,7 +29,5 @@ def create_app():
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/auth')
 
-    with app.app_context():
-        db.create_all()  # ensures tables exist in MySQL
 
     return app

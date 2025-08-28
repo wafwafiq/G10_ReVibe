@@ -13,7 +13,7 @@ def sign_up():
         username = request.form.get('username')
         fullName = request.form.get('fullName')  # optional if you have another field
         password = request.form.get('password')
-        confirmPassword = request.form.get('confirmPassword')
+        confirmPassword = request.form.get('confirm_password')
 
         # Basic validation
         if password != confirmPassword:
