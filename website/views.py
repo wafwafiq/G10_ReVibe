@@ -23,8 +23,9 @@ def map():
 def chats():
     return ('chat page')
 
-@views.route('/users')
-def lists_users():
-    # Example: fetch users from DB
+#moved from main to views
+# Route to display users
+@views.route('/')
+def index():
     users = User.query.all()
-    return '<br>'.join([f"{u.user_id} - {u.name} ({u.email})" for u in users])  
+    return '<br>'.join([f"{u.user_id} - {u.name} ({u.email})" for u in users]) 

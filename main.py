@@ -1,8 +1,24 @@
-from website import create_app,db
+from website import create_app
+from website import db
+from website.models  import User
 
 app = create_app()
 
+
+# Run the app
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()  # creates tables if not present
+        db.reflect()  # Refresh metadata
+        # Example: add a test user if table is empty
+        if not User.query.first():
+            test_user = User(
+                user_id="U001",
+                name="Alice",
+                password="password123",
+                email="alice@example.com"
+            )
+            db.session.add(test_user)
+            db.session.commit()
+
     app.run(debug=True)
