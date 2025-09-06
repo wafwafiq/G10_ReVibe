@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Marketplace - ReVibe{% endblock %}
+
+{% block content %}
+<div class="catalog-page">
+    <h1 class="page-title">Browse Catalog</h1>
+
+     <!-- Category tabs -->
+    <div class="category-section">
+        <h2 class="section-title">Categories</h2>
+        <div class="category-tabs">
+            <button class="category-tab active" data-category="all">All Items</button>
+            <button class="category-tab" data-category="books">Books</button>
+            <button class="category-tab" data-category="electronics">Electronics</button>
+            <button class="category-tab" data-category="furniture"> Furniture</button>
+            <button class="category-tab" data-category="clothing">Clothing</button>
+            <button class="category-tab" data-category="sports"> Sports</button>
+            <button class="category-tab" data-category="kitchen"> Kitchen</button>
+        </div>
+    </div>
+
+    <!-- Search and filter section -->
+    <div class="search-sort-section">
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="🔍 Search items...">
+            <button class="search-btn">Search</button>
+        </div>
+        
+        <div class="sort-container">
+            <label for="sort-select" class="sort-label">Sort by:</label>
+            <select id="sort-select" class="sort-select">
+                <option value="newest">Newest First</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="condition">Condition</option>
+                <option value="location">Location</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Items display section -->
+    <div class="items-section">
+        <h2 class="section-title">Available Items</h2>
+        
+        <div class="items-grid">
+            {% if items %}
+                {% for item in items %}
+                <div class="item-card">
+                    <div class="item-image">
+                        <div class="image-placeholder">📦</div>
+                    </div>
+                    <div class="item-info">
+                        <h3 class="item-title">{{ item.title }}</h3>
+                        <p class="item-price">RM {{ item.price }}</p>
+                        <p class="item-location">📍 {{ item.location }}</p>
+                        <p class="item-condition">Condition: {{ item.condition }}</p>
+                        <p class="item-time">Posted {{ item.time_ago }}</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="view-details-btn">View Details</button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Empty state when no items available -->
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <h3>No items available</h3>
+                    <p>lol :P</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
