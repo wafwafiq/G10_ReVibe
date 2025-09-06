@@ -84,7 +84,17 @@
 {% block scripts %}
 <script>
     // Initialize map (centered on MMU Cyberjaya as default)
-    var map = L.map('map').setView([2.9225, 101.6573], 14);
+    var map = L.map('map', {
+    center: [2.927060, 101.642096],
+    zoom: 17,
+    dragging: false,
+    zoomControl: false,
+    scrollWheelZoom: false,
+    doubleClickZoom: false,
+    boxZoom: false,
+    keyboard: false,
+    tap: false
+});
 
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
