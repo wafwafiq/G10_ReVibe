@@ -2,7 +2,8 @@ from website import create_app
 from website import db
 from website.models  import User
 
-app = create_app()
+# Initialize Flask app
+app = Flask(__name__)
 
 
 # Run the app
