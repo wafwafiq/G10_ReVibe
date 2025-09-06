@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if item %}{{ item.title }} - ReVibe{% else %}Item Not Found - ReVibe{% endif %}{% endblock %}
+
+{% block content %}
+<div class="item-detail-page">
+    <!-- Breadcrumb Navigation -->
+    <nav class="breadcrumb">
+        <a href="{{ url_for('views.catalog') }}" class="breadcrumb-link">← Catalog</a>
+    </nav>
+
+    {% if item %}
+    <div class="item-detail-container">
+        <!-- Left Column: Photo Gallery -->
+        <div class="photo-gallery">
+            <div class="main-photo">
+                {% if item.images %}
+                    <img src="{{ item.images[0] }}" alt="{{ item.title }}" class="main-image" id="main-image">
+                {% else %}
+                    <div class="image-placeholder main-placeholder">
+                        <span class="placeholder-icon">📦</span>
+                        <p>No image available</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="thumbnail-gallery">
+                {% if item.images %}
+                    {% for image in item.images %}
+                    <img src="{{ image }}" alt="Item photo {{ loop.index }}" class="thumbnail" onclick="changeMainImage(this.src)">
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Column: Item Information -->
+        <div class="item-info-panel">
+            <!-- Item title and price -->
+            <div class="item-header">
+                <h1 class="item-title">{{ item.title }}</h1>
+                <div class="item-price">RM {{ item.price }}</div>
+                <div class="item-badges">
+                    <span class="condition-badge {{ item.condition }}">
+                        {{ item.condition.title() }}
+                    </span>
+                    <span class="category-badge">
+                        {{ item.category.title() }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Item specifications -->
+            <div class="item-specs">
+                <h3 class="specs-title">Item Details</h3>
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">Condition:</span>
+                        <span class="spec-value">{{ item.condition.title() }}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Category:</span>
+                        <span class="spec-value">{{ item.category.title() }}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Location:</span>
+                        <span class="spec-value">📍 {{ item.location.title() }}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Posted:</span>
+                        <span class="spec-value">{{ item.created_at.strftime('%B %d, %Y') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item Description -->
+            <div class="item-description">
+                <h3 class="description-title">📝 Description</h3>
+                <div class="description-content">
+                    <p>{{ item.description }}</p>
+                </div>
+            </div>
+
+            <!-- Seller Information -->
+            <div class="seller-info">
+                <h3 class="seller-title">👤 Seller Information</h3>
+                <div class="seller-card">
+                    <div class="seller-avatar">
+                        <span class="avatar-icon">👤</span>
+                    </div>
+                    <div class="seller-details">
+                        <h4 class="seller-name">{{ item.seller.name }}</h4>
+                        <p class="seller-email">{{ item.seller.email }}</p>
+                        <p class="seller-joined">Member since {{ item.seller.created_at.strftime('%B %Y') }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Actions -->
+            <div class="contact-actions">
+                <button class="btn-contact-seller" onclick="contactSeller({{ item.id }})">
+                    💬 Contact Seller
+                </button>
+                <p class="contact-note">
+                    You'll be redirected to chat with the seller
+                </p>
+            </div>
+
+            <!-- Safety Notice -->
+            <div class="safety-notice">
+                <h4>🛡️ Stay Safe</h4>
+                <ul>
+                    <li>Meet in public places on campus</li>
+                    <li>Inspect items before payment</li>
+                    <li>Report suspicious activity</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Item not found -->
+    <div class="item-not-found">
+        <div class="not-found-icon">🔍</div>
+        <h2>Item Not Found</h2>
+        <p>The item you're looking for doesn't exist or has been removed.</p>
+        <a href="{{ url_for('views.catalog') }}" class="btn-back-catalog">←Catalog</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Simple image gallery functionality
+function changeMainImage(newSrc) {
+    const mainImage = document.getElementById('main-image');
+    if (mainImage) {
+        mainImage.src = newSrc;
+    }
+}
+
+// Contact seller functionality(chat later)
+function contactSeller(itemId) {
+    // chat page later
+    console.log('Contact seller for item ID:', itemId);
+}
+</script>
+{% endblock %}
