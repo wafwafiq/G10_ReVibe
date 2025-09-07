@@ -1,8 +1,8 @@
 from . import db
-from flask_login import UserMixin
 from datetime import datetime
+from flask_login import UserMixin 
 
-class User(UserMixin, db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = 'users'   
 
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -16,3 +16,6 @@ class User(UserMixin, db.Model):
     
     def __repr__(self):
         return f"<User {self.name}>"
+    
+    def get_id(self):
+        return str(self.user_id) #fixed code stopping from logging

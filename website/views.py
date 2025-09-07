@@ -1,19 +1,21 @@
-from flask import Blueprint, render_template , request #adam z added request
+from flask import Blueprint, render_template , request
+from flask_login import login_required, current_user
 from .models import User
 
 views = Blueprint('views', __name__)
 
 @views.route('/home')
+@login_required
 def home():
     return render_template('main.html')
 
 @views.route('/posts')
 def posts():
-    return render_template('post_creation.html') #changed by adam z
+    return render_template('post_creation.html') 
 
 @views.route('/catalog')
 def catalog():
-    return render_template('catalog.html') #changed by adam z
+    return render_template('catalog.html') 
 
 @views.route('/map')
 def map():
@@ -23,12 +25,13 @@ def map():
 def chats():
     return ('chat page')
 
-@views.route('/users')
-def lists_users():
-    # Example: fetch users from DB
+
+@views.route('/')
+def index():
     users = User.query.all()
     return '<br>'.join([f"{u.user_id} - {u.name} ({u.email})" for u in users])
 
 @views.route('/item/<int:item_id>')
 def item_detail(item_id):
-    return render_template('item_detail.html')  #adam z added item_detail.html
+    return render_template('item_detail.html')  
+
