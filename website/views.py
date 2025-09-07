@@ -31,4 +31,4 @@ def lists_users():
 
 @views.route('/item/<int:item_id>')
 def item_detail(item_id):
-    return render_template('item_detail.html')  
+    return render_template('item_detail.html')  #adam z added item_detail.html
