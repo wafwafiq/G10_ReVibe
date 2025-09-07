@@ -7,8 +7,8 @@ login_manager = LoginManager()
 
 def create_app(): 
     app = Flask(__name__)
-    # MySQL code from main moved to init
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:ogezuJ4qNR7Jk9Mb@localhost/revibe'
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:ogezuJ4qNR7Jk9Mb@localhost:3306/revibe'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.secret_key = "your_secret_key"
 
@@ -21,7 +21,7 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(user_id)  # removed int(), matches VARCHAR primary key
+        return User.query.get(user_id)  
     
     from .views import views
     from .auth import auth

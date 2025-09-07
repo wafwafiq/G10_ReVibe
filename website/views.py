@@ -23,8 +23,7 @@ def map():
 def chats():
     return ('chat page')
 
-#moved from main to views
-# Route to display users
+
 @views.route('/')
 def index():
     users = User.query.all()
