@@ -9,27 +9,13 @@
     
     <form method="POST">
         <div class="form-group">
-            <label for="full_name" class="form-label">Full Name</label>
+            <label for="name" class="form-label">Full Name</label>
             <input 
                 type="text" 
-                id="full_name" 
-                name="full_name" 
+                id="name" 
+                name="name" 
                 class="form-input" 
                 placeholder="Enter your full name"
-                required
-            >
-        </div>
-        
-        <div class="form-group">
-            <label for="username" class="form-label">Username</label>
-            <input 
-                type="text" 
-                id="username" 
-                name="username" 
-                class="form-input" 
-                placeholder="Choose a unique username"
-                pattern="[a-zA-Z0-9_]{3,}"
-                title="Username must be 3+ characters, letters, numbers, and underscore only"
                 required
             >
         </div>
@@ -71,6 +57,7 @@
                 placeholder="Confirm your password"
                 required
             >
+            <small class="form-note">Note: This field is for validation only, not stored in database</small>
         </div>
         
         <button type="submit" class="btn">Create Account</button>
