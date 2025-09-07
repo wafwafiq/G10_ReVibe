@@ -12,7 +12,7 @@ if __name__ == "__main__":
         db.reflect()
         if not User.query.first():
             test_user = User(
-                user_id=1,  # must be an integer, not "U001"
+                user_id=1,
                 name="Alice",
                 password="password123",
                 email="alice@example.com"

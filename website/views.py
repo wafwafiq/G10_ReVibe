@@ -1,19 +1,21 @@
-from flask import Blueprint, render_template , request #adam z added request
+from flask import Blueprint, render_template , request
+from flask_login import login_required, current_user #imported login_required to restrict easy access
 from .models import User
 
 views = Blueprint('views', __name__)
 
 @views.route('/home')
+@login_required #must be logged in to access
 def home():
     return render_template('main.html')
 
 @views.route('/posts')
 def posts():
-    return render_template('post_creation.html') #changed by adam z
+    return render_template('post_creation.html') 
 
 @views.route('/catalog')
 def catalog():
-    return render_template('catalog.html') #changed by adam z
+    return render_template('catalog.html') 
 
 @views.route('/map')
 def map():

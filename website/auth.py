@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from .models import User
 from . import db
 from datetime import datetime
+from flask_login import login_user, login_required, logout_user, current_user #added flask login to restrict access unless logged in
 import uuid  
 auth = Blueprint('auth', __name__)
 
@@ -27,7 +28,6 @@ def sign_up():
             flash("Email or username already exists!", category="error")
             return redirect(url_for('auth.sign_up'))
 
-        #removed code causing database error
 
         new_user = User(
                 
@@ -39,7 +39,8 @@ def sign_up():
 
         db.session.add(new_user)
         db.session.commit()
-
+        
+        login_user(new_user, remember=True) 
         flash("Account created successfully!", category="success")
         return redirect(url_for('auth.login'))
 
@@ -56,6 +57,7 @@ def login():
         user = User.query.filter_by(email=email, password=password).first()
         if user:
             flash(f"Welcome {user.name}!", category="success")
+            login_user(user, remember=True)
             return redirect(url_for('views.home'))
         else:
             flash("Invalid email or password", category="error")
@@ -65,6 +67,8 @@ def login():
 
 
 @auth.route('/logout')
+@login_required
 def logout():
+    logout_user()
     flash("Logged out successfully", category="success")
     return redirect(url_for('views.home'))
