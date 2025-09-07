@@ -1,6 +1,6 @@
 from . import db
 from datetime import datetime
-from flask_login import UserMixin #helps with login system
+from flask_login import UserMixin 
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'   
@@ -13,3 +13,6 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"<User {self.name}>"
+    
+    def get_id(self):
+        return str(self.user_id) #fixed code stopping from logging

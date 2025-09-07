@@ -1,11 +1,11 @@
 from flask import Blueprint, render_template , request
-from flask_login import login_required, current_user #imported login_required to restrict easy access
+from flask_login import login_required, current_user
 from .models import User
 
 views = Blueprint('views', __name__)
 
 @views.route('/home')
-@login_required #must be logged in to access
+@login_required
 def home():
     return render_template('main.html')
 
@@ -34,3 +34,4 @@ def index():
 @views.route('/item/<int:item_id>')
 def item_detail(item_id):
     return render_template('item_detail.html')  
+

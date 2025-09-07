@@ -39,8 +39,8 @@ def sign_up():
 
         db.session.add(new_user)
         db.session.commit()
-        
-        login_user(new_user, remember=True) 
+
+        #removed logic error 
         flash("Account created successfully!", category="success")
         return redirect(url_for('auth.login'))
 
