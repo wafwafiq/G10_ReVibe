@@ -10,7 +10,7 @@ def home():
     return render_template('main.html')
 
 @views.route('/posts')
-@login_required #must be logged in to access home, posts, catalog, map and chat 
+@login_required
 def posts():
     return render_template('post_creation.html') 
 
@@ -27,8 +27,12 @@ def map():
 @views.route('/chat')
 @login_required
 def chats():
-    return ('chat page')
+    return render_template('chatlog.html') 
 
+@views.route('/settings')
+@login_required
+def settings():
+    return render_template('settings.html')
 
 @views.route('/')
 def index():

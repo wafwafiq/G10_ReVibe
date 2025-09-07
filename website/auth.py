@@ -3,7 +3,8 @@ from .models import User
 from . import db
 from datetime import datetime
 from flask_login import login_user, login_required, logout_user, current_user
-import uuid  
+import uuid
+
 auth = Blueprint('auth', __name__)
 
 @auth.route('/signup', methods=['GET','POST'])
@@ -22,7 +23,6 @@ def sign_up():
 
         existing_user = User.query.filter(
             (User.email == email) | (User.name == name)
-            (User.email == email) | (User.name == name)
         ).first()
         if existing_user:
             flash("Email or username already exists!", category="error")
@@ -40,7 +40,7 @@ def sign_up():
         db.session.add(new_user)
         db.session.commit()
 
-         
+ 
         flash("Account created successfully!", category="success")
         return redirect(url_for('auth.login'))
 
