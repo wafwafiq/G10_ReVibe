@@ -1,5 +1,4 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_user, logout_user, login_required, current_user
 from .models import User
 from . import db
 from datetime import datetime
@@ -11,8 +10,7 @@ auth = Blueprint('auth', __name__)
 def sign_up():
     if request.method == 'POST':
         email = request.form.get('email')
-        username = request.form.get('username')
-        fullName = request.form.get('fullName')  
+        name = request.form.get('name') 
         password = request.form.get('password')
         confirmPassword = request.form.get('confirm_password')
 
@@ -23,7 +21,7 @@ def sign_up():
 
 
         existing_user = User.query.filter(
-            (User.email == email) | (User.name == username)
+            (User.email == email) | (User.name == name)
         ).first()
         if existing_user:
             flash("Email or username already exists!", category="error")
@@ -32,7 +30,7 @@ def sign_up():
 
         new_user = User(
                 
-            name=username,
+            name=name,
             email=email,
             password=password,
             created_at=datetime.utcnow()
