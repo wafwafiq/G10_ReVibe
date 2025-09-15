@@ -23,7 +23,11 @@ def map():
 
 @views.route('/chat')
 def chats():
-    return ('chat page')
+    return render_template('chatlog.html') 
+
+@views.route('/settings')
+def settings():
+    return render_template('settings.html')
 
 
 @views.route('/')

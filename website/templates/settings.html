@@ -17,16 +17,15 @@
             </div>
             
             <!-- information - sends data to Flask backend -->
-            <form class="settings-form" method="POST" action="{{ url_for('views.update_profile') }}">
+            <form class="settings-form" method="POST" action="#">
                 <div class="form-group">
                     <label for="name" class="form-label">Full Name</label>
                     <input 
-                        type="text"  <!-- Text input for name -->
-                        id="name"  <!-- HTML ID for label association and JavaScript -->
-                        name="name"  <!-- Form field name - backend receives as request.form['name'] -->
+                        type="text"
+                        id="name"
+                        name="name"
                         class="form-input" 
-                        value="{{ current_user.name if current_user.is_authenticated else '' }}"  <!-- Pre-fill with current user's name from database -->
-                        required 
+                        value="{{ current_user.name if current_user.is_authenticated else '' }}"
                     >
                 </div>
 
@@ -40,8 +39,7 @@
                         id="email" 
                         name="email" 
                         class="form-input"
-                        value="{{ current_user.email if current_user.is_authenticated else '' }}"  <!-- Pre-fill with current user's email -->
-                        required  <!-- Email is required field -->
+                        value="{{ current_user.email if current_user.is_authenticated else '' }}"
                     >
                 </div>
 
@@ -61,18 +59,17 @@
             </div>
             
             <!-- Password change form - sends data to Flask backend route -->
-            <form class="settings-form" method="POST" action="{{ url_for('views.change_password') }}">
+            <form class="settings-form" method="POST" action="#">
                 
                 <!-- Current password field - security measure to verify user identity -->
                 <!-- Backend will receive this as request.form['current_password'] -->
                 <div class="form-group">
                     <label for="current-password" class="form-label">Current Password</label>
                     <input 
-                        type="password"  <!-- Hides input with dots for security -->
-                        id="current-password" 
-                        name="current_password"  
+                        type="password"
+                        id="current-password"
+                        name="current_password"
                         class="form-input"
-                        required 
                     >
                 </div>
 
@@ -107,7 +104,7 @@
 
                 <!-- Submit button for password change -->
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-secondary">Update Password</button>
+                    <button type="submit" class="btn btn-primary">Update Password</button>
                 </div>
             </form>
         </div>
