@@ -17,5 +17,3 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f"<User {self.name}>"
     
-    def get_id(self):
-        return str(self.user_id) #fixed code stopping from logging

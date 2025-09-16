@@ -1768,3 +1768,31 @@ body {
         height: 160px;
     }
 }
+
+.map-container {
+  display: flex;
+  height: 500px;
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+}
+
+#sidebar {
+  width: 250px;
+  background: #fff;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+}
+
+#sidebar input,
+#sidebar select {
+  width: 100%;
+  margin: 5px 0;
+  padding: 5px;
+}
+
+#map {
+  flex: 1;
+}
