@@ -1,5 +1,5 @@
 from . import db
-from datetime import datetime
+from datetime import datetime 
 from flask_login import UserMixin 
 
 class User(db.Model, UserMixin):
@@ -11,9 +11,10 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(255), unique=True, nullable=False)
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow)
 
-    def get_id(self):
-        return str(self.user_id)
+
     
     def __repr__(self):
         return f"<User {self.name}>"
     
+    def get_id(self):
+        return str(self.user_id)
