@@ -10,8 +10,7 @@ auth = Blueprint('auth', __name__)
 def sign_up():
     if request.method == 'POST':
         email = request.form.get('email')
-        username = request.form.get('username')
-        fullName = request.form.get('fullName')  
+        name = request.form.get('name')  
         password = request.form.get('password')
         confirmPassword = request.form.get('confirm_password')
 
@@ -22,7 +21,7 @@ def sign_up():
 
 
         existing_user = User.query.filter(
-            (User.email == email) | (User.name == username)
+            (User.email == email) | (User.name == name)
         ).first()
         if existing_user:
             flash("Email or username already exists!", category="error")
@@ -31,7 +30,7 @@ def sign_up():
 
         new_user = User(
                 
-            name=username,
+            name=name,
             email=email,
             password=password,
             created_at=datetime.utcnow()
@@ -49,6 +48,9 @@ def sign_up():
 
 @auth.route('/login', methods=['GET','POST'])
 def login():
+    if current_user.is_authenticated: #code does not bring them to login unless logged out
+        return redirect(url_for('views.home'))
+    
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
