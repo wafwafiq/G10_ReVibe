@@ -1159,7 +1159,7 @@ body {
 }
 
 /* =============================================================================
-   CATALOG PAGE STYLES - Shopee-inspired MMU Design
+   CATALOG PAGE STYLES - 
    ============================================================================= */
 
 /* Catalog Container */
@@ -1601,6 +1601,113 @@ body {
 }
 
 /* =============================================================================
+   CATALOG PAGE : Search & Filter Section
+   ============================================================================= */
+
+/* .search-filter-section - Container for search and filter controls */
+.catalog-page .search-filter-section {
+    display: flex;
+    gap: 2rem;
+    align-items: end;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* .search-container - Search input and button */
+.catalog-page .search-container {
+    flex: 2;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.catalog-page .search-input {
+    flex: 1;
+    padding: 0.8rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.catalog-page .search-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.catalog-page .search-btn {
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.catalog-page .search-btn:hover {
+    background: var(--primary-blue);
+    transform: translateY(-1px);
+}
+
+/* .filter-container - Category filter dropdown */
+.catalog-page .filter-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.catalog-page .filter-label {
+    font-weight: 600;
+    color: var(--dark-gray);
+    font-size: 0.9rem;
+}
+
+.catalog-page .category-filter {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.catalog-page .category-filter:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Responsive adjustments for search-filter section */
+@media (max-width: 768px) {
+    .catalog-page .search-filter-section {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .catalog-page .search-container {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .catalog-page .search-input {
+        order: 1;
+    }
+    
+    .catalog-page .search-btn {
+        order: 2;
+    }
+}
+
+/* =============================================================================
    CATALOG PAGE : Items Grid & Card Styling
    ============================================================================= */
 
@@ -1671,7 +1778,7 @@ body {
 .catalog-page .item-price {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #dc2626; /* MMU red */
+    color: #dc2626; /* red */
     margin-bottom: 0.5rem;
 }
 
@@ -1693,7 +1800,7 @@ body {
     border-top: 1px solid #f3f4f6;
 }
 
-/* .view-details-btn - Button styling with MMU colors */
+/* .view-details-btn - Button styling */
 .catalog-page .view-details-btn {
     width: 100%;
     background: #1e40af; /* MMU blue */
