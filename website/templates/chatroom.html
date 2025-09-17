@@ -64,7 +64,7 @@
             <!-- Mark as sold button (for seller only) -->
             {% if current_user.is_authenticated and item and current_user.user_id == item.seller_id %}
             <div class="seller-actions">
-                <button class="mark-sold-btn" onclick="markAsSold({{ item.id }})">
+                <button class="mark-sold-btn">
                     ✅ Mark as Sold
                 </button>
             </div>
@@ -73,8 +73,64 @@
     </div>
     
     <!-- Message Display Area - Shows chat history -->
+    <div class="messages-container">
+        <div class="messages-area">
+            {% if messages %}
+                {% for message in messages %}
+                <!-- Individual message bubble -->
+                <div class="message-bubble {{ 'sent' if message.sender_id == current_user.user_id else 'received' }}">
+                    <!-- Message content -->
+                    <div class="message-content">
+                        <p class="message-text">{{ message.content }}</p>
+                    </div>
+                    
+                    <!-- Message metadata -->
+                    <div class="message-meta">
+                        <span class="message-time">{{ message.created_at.strftime('%I:%M %p') }}</span>
+                        {% if message.sender_id == current_user.user_id %}
+                            <span class="message-status">✓</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Empty chat state -->
+                <div class="empty-chat-state">
+                    <div class="empty-chat-icon">💬</div>
+                    <h3 class="empty-chat-title">Start the conversation</h3>
+                    <p class="empty-chat-description">Send a message to begin discussing this item</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
     
     <!-- Message Input Form - Send new messages -->
+    <div class="message-input-container">
+        <form class="message-form" method="POST" action="{{ url_for('views.send_message', item_id=item.id) if item else '#' }}">
+            <!-- Message input area -->
+            <div class="input-group">
+                <textarea 
+                    class="message-input" 
+                    name="message_content"
+                    placeholder="Type your message..."
+                    rows="1"
+                    maxlength="500"
+                    required
+                ></textarea>
+                
+                <!-- Send button -->
+                <button type="submit" class="send-btn" title="Send message">
+                    <span class="send-icon">➤</span>
+                </button>
+            </div>
+            
+            <!-- Character counter and form info -->
+            <div class="input-meta">
+                <small class="char-info">Max 500 characters</small>
+                <small class="form-hint">send</small>
+            </div>
+        </form>
+    </div>
 
 </div>
 {% endblock %}
