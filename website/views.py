@@ -10,7 +10,7 @@ def home():
     return render_template('main.html')
 
 @views.route('/posts')
-@login_required #must be logged in to access posts, catalog, map and chat 
+@login_required #must be logged in to access home, posts, catalog, map and chat 
 def posts():
     return render_template('post_creation.html') 
 
