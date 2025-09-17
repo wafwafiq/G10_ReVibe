@@ -6,7 +6,7 @@
 <div class="post-creation-page">
     <div class="post-header">
         <h1 class="page-title">Post New Item</h1>
-        <p class="page-subtitle">Exchamge your item</p>
+        <p class="page-subtitle">Exchange your item</p>
     </div>
 
     <form method="POST" enctype="multipart/form-data" class="post-form">
@@ -23,6 +23,7 @@
                     <small>Upload up to a photo (JPG, PNG, max 10MB each)</small>
                 </label>
                 <div class="image-preview-container">
+                    <!-- Images will be shown here with delete buttons -->
                 </div>
             </div>
         </div>
@@ -88,39 +89,28 @@
             </div>
         </div>
 
-        <!-- Condition & Location -->
+        <!-- Item Condition -->
         <div class="form-section">
-            <h3 class="section-title">📍 Condition & Location</h3>
+            <h3 class="section-title">⭐ Item Condition</h3>
             
             <div class="form-group">
-                <label class="form-label">Item Condition *</label>
-                <div class="condition-options">
-                    <label class="condition-option">
-                        <input type="radio" name="item_condition" value="new" required>
-                        <span class="condition-label">
-                            <strong>New</strong>
-                            <small>Brand new, unused, with original packaging</small>
-                        </span>
-                    </label>
-                    <label class="condition-option">
-                        <input type="radio" name="item_condition" value="good" required>
-                        <span class="condition-label">
-                            <strong>Good</strong>
-                            <small>Used but well maintained, minor wear</small>
-                        </span>
-                    </label>
-                    <label class="condition-option">
-                        <input type="radio" name="item_condition" value="fair" required>
-                        <span class="condition-label">
-                            <strong>Fair</strong>
-                            <small>Shows signs of use, may have defects</small>
-                        </span>
-                    </label>
-                </div>
+                <label for="item-condition" class="form-label">Condition *</label>
+                <select id="item-condition" name="item_condition" class="form-select" required>
+                    <option value="">Select condition</option>
+                    <option value="new">✨ New - Brand new, unused, with original packaging</option>
+                    <option value="good">👍 Good - Used but well maintained, minor wear</option>
+                    <option value="fair">⚠️ Fair - Shows signs of use, may have defects</option>
+                </select>
+                <small class="form-note">Be honest about the item's condition</small>
             </div>
+        </div>
 
+        <!-- Pickup Location -->
+        <div class="form-section">
+            <h3 class="section-title">📍 Pickup Location</h3>
+            
             <div class="form-group">
-                <label for="item-location" class="form-label">Pickup Location *</label>
+                <label for="item-location" class="form-label">Location *</label>
                 <select id="item-location" name="item_location" class="form-select" required>
                     <option value="">Select pickup location</option>
                     
@@ -141,6 +131,7 @@
                 </select>
                 <small class="form-note">Choose specific location for easy meetup</small>
             </div>
+        </div>
         <!-- Contact Information -->
         <div class="form-section">
             <h3 class="section-title">📞Contact</h3>
@@ -153,8 +144,8 @@
 
         <!-- Form Actions -->
         <div class="form-actions">
-            <button type="button" class="btn-secondary" onclick="history.back()">Cancel</button>
-            <button type="submit" class="btn-primary">Post My Item</button>
+            <a href="{{ url_for('views.home') }}" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-primary">Post</button>
         </div>
     </form>
 </div>
