@@ -29,7 +29,7 @@ def create_app():
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/auth')
 
-#added security changes if user go back from main to login to avoid being logged in while in login page
+
     @app.after_request
     def add_header(response):
         response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"

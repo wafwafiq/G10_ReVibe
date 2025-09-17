@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from .models import User
 from . import db
 from datetime import datetime
-from flask_login import login_user, login_required, logout_user, current_user #added flask login to restrict access unless logged in
+from flask_login import login_user, login_required, logout_user, current_user
 import uuid  
 auth = Blueprint('auth', __name__)
 
@@ -32,7 +32,6 @@ def sign_up():
         new_user = User(
                 
             name=name,
-            name=name,
             email=email,
             password=password,
             created_at=datetime.utcnow()
@@ -41,7 +40,7 @@ def sign_up():
         db.session.add(new_user)
         db.session.commit()
 
-        #removed logic error 
+         
         flash("Account created successfully!", category="success")
         return redirect(url_for('auth.login'))
 
@@ -50,7 +49,7 @@ def sign_up():
 
 @auth.route('/login', methods=['GET','POST'])
 def login():
-    if current_user.is_authenticated: #code does not bring them to login unless logged out
+    if current_user.is_authenticated: 
         return redirect(url_for('views.home'))
     
     if request.method == 'POST':
