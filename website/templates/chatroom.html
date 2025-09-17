@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Chat - ReVibe{% endblock %}
+
+{% block content %}
+<div class="chatroom-page">
+    <!--Shows who you're chatting with and navigation -->
+    <div class="chat-header">
+        <!-- Back button to return to chatlog -->
+        <div class="chat-nav">
+            <a href="{{ url_for('views.chats') }}" class="back-btn">
+                <span class="back-icon">←</span>
+                <span>Back to Messages</span>
+            </a>
+        </div>
+        
+        <!-- Chat participant info -->
+        <div class="chat-participant">
+            <div class="participant-avatar">
+                <span class="avatar-placeholder">👤</span>
+            </div>
+            <div class="participant-info">
+                <h2 class="participant-name">{{ other_user.name if other_user else 'Chat User' }}</h2>
+                <p class="participant-status">Online • Last seen recently</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Item Context Section - Shows what item is being discussed -->
+    <div class="item-context">
+        <!-- Item being discussed -->
+        <div class="context-item">
+            <!-- Item image -->
+            <div class="context-item-image">
+                <img src="{{ item.image_url if item.image_url else '/static/images/placeholder-item.jpg' }}" 
+                     alt="{{ item.title }}" 
+                     class="item-thumbnail">
+            </div>
+            
+            <!-- Item details -->
+            <div class="context-item-details">
+                <h3 class="context-item-title">{{ item.title if item else 'Item Discussion' }}</h3>
+                <div class="context-item-meta">
+                    <span class="context-price">RM {{ item.price if item else '0.00' }}</span>
+                </div>
+            </div>
+            
+            <!-- Quick actions to view full details-->
+            <div class="context-actions">
+                <a href="{{ url_for('views.item_detail', item_id=item.id) if item else '#' }}" 
+                   class="view-item-btn">
+                    View Full Details
+                </a>
+            </div>
+        </div>
+        
+        <!-- Chat status indicator -->
+        <div class="chat-status">
+            <div class="status-indicator">
+                <span class="status-dot active"></span>
+                <span class="status-text">Discussion in progress</span>
+            </div>
+            
+            <!-- Mark as sold button (for seller only) -->
+            {% if current_user.is_authenticated and item and current_user.user_id == item.seller_id %}
+            <div class="seller-actions">
+                <button class="mark-sold-btn" onclick="markAsSold({{ item.id }})">
+                    ✅ Mark as Sold
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Message Display Area - Shows chat history -->
+    
+    <!-- Message Input Form - Send new messages -->
+
+</div>
+{% endblock %}
