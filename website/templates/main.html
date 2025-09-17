@@ -10,48 +10,28 @@
         <p class="welcome-subtitle">Your MMU Community Marketplace</p>
     </div>
 
-    <!-- Quick Stats -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-number">150+</div>
-            <div class="stat-label">Active Items</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">75+</div>
-            <div class="stat-label">Happy Users</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">25+</div>
-            <div class="stat-label">Items Sold Today</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">10+</div>
-            <div class="stat-label">Categories</div>
-        </div>
-    </div>
-
     <!-- Quick Actions -->
     <div class="quick-actions">
         <h2 class="section-title">Quick Actions</h2>
         <div class="action-grid">
             <a href="{{ url_for('views.posts') }}" class="action-card">
                 <div class="action-icon">📝</div>
-                <h3>Sell an Item</h3>
+                <h3>Sell</h3>
                 <p>List your item for sale or exchange</p>
                 <span class="action-arrow">→</span>
             </a>
             
             <a href="{{ url_for('views.catalog') }}" class="action-card">
                 <div class="action-icon">🔍</div>
-                <h3>Browse Items</h3>
-                <p>Discover items from the MMU community</p>
+                <h3>Catalog</h3>
+                <p>Browse Items</p>
                 <span class="action-arrow">→</span>
             </a>
             
-            <a href="{{ url_for('views.map') }}" class="action-card">
-                <div class="action-icon">🗺️</div>
-                <h3>Explore Map</h3>
-                <p>Find items near your location on campus</p>
+            <a href="{{ url_for('views.settings') }}" class="action-card">
+                <div class="action-icon">⚙️</div>
+                <h3>Settings</h3>
+                <p>Configurate your account</p>
                 <span class="action-arrow">→</span>
             </a>
             
