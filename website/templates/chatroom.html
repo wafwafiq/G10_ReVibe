@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Chat - ReVibe{% endblock %}
+
+{% block content %}
+<div class="chatroom-page">
+    <!--Shows who you're chatting with and navigation -->
+    <div class="chat-header">
+        <!-- Back button to return to chatlog -->
+        <div class="chat-nav">
+            <a href="{{ url_for('views.chats') }}" class="back-btn">
+                <span class="back-icon">←</span>
+                <span>Back to Messages</span>
+            </a>
+        </div>
+        
+        <!-- Chat participant info -->
+        <div class="chat-participant">
+            <div class="participant-avatar">
+                <span class="avatar-placeholder">👤</span>
+            </div>
+            <div class="participant-info">
+                <h2 class="participant-name">{{ other_user.name if other_user else 'Chat User' }}</h2>
+                <p class="participant-status">Online • Last seen recently</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Item Context Section - Shows what item is being discussed -->
+    <div class="item-context">
+        <!-- Item being discussed -->
+        <div class="context-item">
+            <!-- Item image -->
+            <div class="context-item-image">
+                <img src="{{ item.image_url if item.image_url else '/static/images/placeholder-item.jpg' }}" 
+                     alt="{{ item.title }}" 
+                     class="item-thumbnail">
+            </div>
+            
+            <!-- Item details -->
+            <div class="context-item-details">
+                <h3 class="context-item-title">{{ item.title if item else 'Item Discussion' }}</h3>
+                <div class="context-item-meta">
+                    <span class="context-price">RM {{ item.price if item else '0.00' }}</span>
+                </div>
+            </div>
+            
+            <!-- Quick actions to view full details-->
+            <div class="context-actions">
+                <a href="{{ url_for('views.item_detail', item_id=item.id) if item else '#' }}" 
+                   class="view-item-btn">
+                    View Full Details
+                </a>
+            </div>
+        </div>
+        
+        <!-- Chat status indicator -->
+        <div class="chat-status">
+            <div class="status-indicator">
+                <span class="status-dot active"></span>
+                <span class="status-text">Discussion in progress</span>
+            </div>
+            
+            <!-- Mark as sold button (for seller only) -->
+            {% if current_user.is_authenticated and item and current_user.user_id == item.seller_id %}
+            <div class="seller-actions">
+                <button class="mark-sold-btn">
+                    ✅ Mark as Sold
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Message Display Area - Shows chat history -->
+    <div class="messages-container">
+        <div class="messages-area">
+            {% if messages %}
+                {% for message in messages %}
+                <!-- Individual message bubble -->
+                <div class="message-bubble {{ 'sent' if message.sender_id == current_user.user_id else 'received' }}">
+                    <!-- Message content -->
+                    <div class="message-content">
+                        <p class="message-text">{{ message.content }}</p>
+                    </div>
+                    
+                    <!-- Message metadata -->
+                    <div class="message-meta">
+                        <span class="message-time">{{ message.created_at.strftime('%I:%M %p') }}</span>
+                        {% if message.sender_id == current_user.user_id %}
+                            <span class="message-status">✓</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Empty chat state -->
+                <div class="empty-chat-state">
+                    <div class="empty-chat-icon">💬</div>
+                    <h3 class="empty-chat-title">Start the conversation</h3>
+                    <p class="empty-chat-description">Send a message to begin discussing this item</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Message Input Form - Send new messages -->
+    <div class="message-input-container">
+        <form class="message-form" method="POST" action="{{ url_for('views.send_message', item_id=item.id) if item else '#' }}">
+            <!-- Message input area -->
+            <div class="input-group">
+                <textarea 
+                    class="message-input" 
+                    name="message_content"
+                    placeholder="Type your message..."
+                    rows="1"
+                    maxlength="500"
+                    required
+                ></textarea>
+                
+                <!-- Send button -->
+                <button type="submit" class="send-btn" title="Send message">
+                    <span class="send-icon">➤</span>
+                </button>
+            </div>
+            
+            <!-- Character counter and form info -->
+            <div class="input-meta">
+                <small class="char-info">Max 500 characters</small>
+                <small class="form-hint">send</small>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

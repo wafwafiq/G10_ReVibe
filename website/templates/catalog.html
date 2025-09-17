@@ -74,40 +74,117 @@
     </div>
 </div>
 
-    <!-- Map section -->
-    <div class="map-section">
-        <h2 class="section-title">Items on Map</h2>
-        <div id="map" style="height: 500px; width: 100%; margin-top: 20px; border-radius: 8px;"></div>
+<div class="map-section">
+    <h2 class="section-title">Items on Map</h2>
+    <div class="map-container">
+        
+        <!-- Sidebar -->
+        <div id="sidebar">
+            <h3>Items</h3>
+            <input type="text" id="map-search" placeholder="🔍 Search items...">
+            <select id="map-category">
+                <option value="all">All Categories</option>
+                <option value="books">Books</option>
+                <option value="electronics">Electronics</option>
+                <option value="furniture">Furniture</option>
+                <option value="clothing">Clothing</option>
+                <option value="sports">Sports</option>
+                <option value="kitchen">Kitchen</option>
+            </select>
+            <ul class="map-item-list">
+                {% for item in items %}
+                {% if item.latitude and item.longitude %}
+                <li data-lat="{{ item.latitude }}" data-lng="{{ item.longitude }}">
+                    <strong>{{ item.title }}</strong><br>
+                    <small>{{ item.category }} • RM {{ item.price }}</small>
+                </li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Map -->
+        <div id="map"></div>
     </div>
+</div>
 
 {% endblock %}
 {% block scripts %}
 <script>
-    // Initialize map (centered on MMU Cyberjaya as default)
+    // Initialize map (locked to MMU Cyberjaya location)
     var map = L.map('map', {
-    center: [2.927060, 101.642096],
-    zoom: 17,
-    dragging: false,
-    zoomControl: false,
-    scrollWheelZoom: false,
-    doubleClickZoom: false,
-    boxZoom: false,
-    keyboard: false,
-    tap: false
-});
+        center: [2.927673, 101.641924], // your link coords
+        zoom: 18,
+        dragging: false,
+        zoomControl: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false,
+        touchZoom: false
+    });
 
-    // Add OpenStreetMap tiles
+    // Add tiles (OpenStreetMap)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
+        maxZoom: 17,
+        minZoom: 16, // prevents zooming out
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Example: Add a marker for each item (if location has coordinates)
+    // Store markers
+    var allMarkers = {};
+
     {% for item in items %}
         {% if item.latitude and item.longitude %}
-            L.marker([{{ item.latitude }}, {{ item.longitude }}]).addTo(map)
-                .bindPopup("<b>{{ item.title }}</b><br>RM {{ item.price }}<br>{{ item.location }}");
+            var marker = L.marker([{{ item.latitude }}, {{ item.longitude }}])
+                .bindPopup("<b>{{ item.title }}</b><br>RM {{ item.price }}<br>{{ item.location }}")
+                .addTo(map);
+
+            marker.category = "{{ item.category|lower }}";
+            marker.name = "{{ item.title|lower }}";
+            allMarkers["{{ item.title }}"] = marker;
         {% endif %}
     {% endfor %}
+
+    // Update markers function (filters by category + search)
+    function updateMarkers(selectedCategory, searchTerm) {
+        searchTerm = searchTerm.toLowerCase();
+
+        Object.values(allMarkers).forEach(marker => {
+            const matchesCategory = (selectedCategory === "all" || marker.category === selectedCategory);
+            const matchesSearch = marker.name.includes(searchTerm);
+
+            if (matchesCategory && matchesSearch) {
+                if (!map.hasLayer(marker)) marker.addTo(map);
+            } else {
+                if (map.hasLayer(marker)) map.removeLayer(marker);
+            }
+        });
+    }
+
+    // Hook up category filter
+    document.getElementById("map-category").addEventListener("change", function() {
+        updateMarkers(this.value, document.getElementById("map-search").value);
+    });
+
+    // Hook up search filter
+    document.getElementById("map-search").addEventListener("input", function() {
+        updateMarkers(document.getElementById("map-category").value, this.value);
+    });
+
+    // Sidebar item → focus marker popup
+    document.querySelectorAll('.map-item-list li').forEach(li => {
+        li.addEventListener('click', () => {
+            let lat = li.dataset.lat;
+            let lng = li.dataset.lng;
+            let title = li.querySelector('strong').textContent;
+            if (lat && lng) {
+                map.setView([lat, lng], 18); // keep zoom fixed
+                if (allMarkers[title]) {
+                    allMarkers[title].openPopup();
+                }
+            }
+        });
+    });
 </script>
 {% endblock %}

@@ -22,6 +22,7 @@ def sign_up():
 
         existing_user = User.query.filter(
             (User.email == email) | (User.name == name)
+            (User.email == email) | (User.name == name)
         ).first()
         if existing_user:
             flash("Email or username already exists!", category="error")
@@ -30,6 +31,7 @@ def sign_up():
 
         new_user = User(
                 
+            name=name,
             name=name,
             email=email,
             password=password,

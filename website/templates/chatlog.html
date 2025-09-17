@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Messages - ReVibe{% endblock %}
+
+{% block content %}
+<div class="chatlog-container">
+    <div class="chatlog-header">
+        <h1 class="chatlog-title">Messages</h1>
+        <p class="chatlog-subtitle">Your conversations about items</p>
+    </div>
+
+    <div class="chatlog-content">
+        <!-- Conversation list wrapper -->
+        <div class="conversations-list">
+            
+            <!-- Dynamic conversation list from backend -->
+            {% if conversations %}
+                {% for conversation in conversations %}
+                <div class="conversation-item">
+                    <!-- Item thumbnail section -->
+                    <div class="conversation-item-image">
+                        <img src="{{ conversation.item.image_url if conversation.item.image_url else '/static/images/placeholder-item.jpg' }}" 
+                             alt="{{ conversation.item.title }}" 
+                             class="item-thumbnail">
+                    </div>
+                    
+                    <!-- Conversation details section -->
+                    <div class="conversation-details">
+                        <!-- Item title and other user's name -->
+                        <div class="conversation-header">
+                            <h3 class="item-title">{{ conversation.item.title }}</h3>
+                            <span class="other-user">with {{ conversation.other_user.name }}</span>
+                        </div>
+                        
+                        <!-- Last message preview -->
+                        <div class="last-message">
+                            <p class="message-text">{{ conversation.last_message.content[:50] }}...</p>
+                            <span class="message-time">{{ conversation.last_message.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Status indicators -->
+                    <div class="conversation-status">
+                        {% if conversation.unread_count > 0 %}
+                            <span class="unread-badge">{{ conversation.unread_count }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <!-- Empty state when no conversations exist -->
+            <div class="empty-state">
+                <div class="empty-icon">💬</div>
+                <h3 class="empty-title">No messages yet</h3>
+                <p class="empty-description">Start browsing items to connect with sellers!</p>
+                <a href="{{ url_for('views.catalog') }}" class="btn btn-primary">Browse Items</a>
+            </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

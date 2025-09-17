@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - ReVibe{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <div class="settings-header">
+        <h1 class="settings-title">Account Settings</h1>
+        <p class="settings-subtitle">Manage your personal information and account preferences</p>
+    </div>
+
+    <div class="settings-content">
+        <div class="settings-section">
+            <div class="section-header">
+                <h2 class="section-title">Personal Information</h2>
+                <p class="section-description">Update your personal details</p>
+            </div>
+            
+            <!-- information - sends data to Flask backend -->
+            <form class="settings-form" method="POST" action="#">
+                <div class="form-group">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input 
+                        type="text"
+                        id="name"
+                        name="name"
+                        class="form-input" 
+                        value="{{ current_user.name if current_user.is_authenticated else '' }}"
+                    >
+                </div>
+
+                <!-- Email address -->
+                <!-- Email input type and provides built-in email validation -->
+                <!-- Backend receives as request.form['email'] -->
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="form-input"
+                        value="{{ current_user.email if current_user.is_authenticated else '' }}"
+                    >
+                </div>
+
+                <!-- Form submit button -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Security Section -->
+        <!-- Purpose: Allow users to change their password for account security -->
+        <div class="settings-section">
+            <div class="section-header">
+                <h2 class="section-title">Security</h2>
+                <p class="section-description">Change your password to keep your account secure</p>
+            </div>
+            
+            <!-- Password change form - sends data to Flask backend route -->
+            <form class="settings-form" method="POST" action="#">
+                
+                <!-- Current password field - security measure to verify user identity -->
+                <!-- Backend will receive this as request.form['current_password'] -->
+                <div class="form-group">
+                    <label for="current-password" class="form-label">Current Password</label>
+                    <input 
+                        type="password"
+                        id="current-password"
+                        name="current_password"
+                        class="form-input"
+                    >
+                </div>
+
+                <!-- New password field with validation -->
+                <!-- Backend receives as request.form['new_password'] -->
+                <div class="form-group">
+                    <label for="new-password" class="form-label">New Password</label>
+                    <input 
+                        type="password" 
+                        id="new-password" 
+                        name="new_password" 
+                        class="form-input"
+                        minlength="8" 
+                        required
+                    >
+                    <small class="form-hint">Must be at least 8 characters long</small>
+                </div>
+
+                <!-- Password confirmation field and prevents typing errors -->
+                <!-- confirm password for Backend to compare this with new_password -->
+                <div class="form-group">
+                    <label for="confirm-password" class="form-label">Confirm New Password</label>
+                    <input 
+                        type="password" 
+                        id="confirm-password" 
+                        name="confirm_password" 
+                        class="form-input"
+                        minlength="8"
+                        required
+                    >
+                </div>
+
+                <!-- Submit button for password change -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Update Password</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
