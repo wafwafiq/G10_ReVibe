@@ -17,7 +17,7 @@
             </div>
             
             <!-- information - sends data to Flask backend -->
-            <form class="settings-form" method="POST" action="#">
+            <form class="settings-form" method="POST" action="/settings">
                 <div class="form-group">
                     <label for="name" class="form-label">Full Name</label>
                     <input 
@@ -59,7 +59,7 @@
             </div>
             
             <!-- Password change form - sends data to Flask backend route -->
-            <form class="settings-form" method="POST" action="#">
+            <form class="settings-form" method="POST" action="/settings">
                 
                 <!-- Current password field - security measure to verify user identity -->
                 <!-- Backend will receive this as request.form['current_password'] -->

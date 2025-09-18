@@ -1796,3 +1796,29 @@ body {
 #map {
   flex: 1;
 }
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; 
+}
+
+body {
+  padding-top: 70px;  
+}
+
+#map {
+  position: relative;
+  z-index: 0;
+  height: calc(100vh - 70px); 
+}
+
+.popup-img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
