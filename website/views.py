@@ -1,6 +1,9 @@
-from flask import Blueprint, render_template , request
+from flask import Blueprint, render_template , request, redirect, url_for, current_app
 from flask_login import login_required, current_user
-from .models import User
+from .models import User, Item #import item db
+from . import db
+import os 
+import uuid
 
 views = Blueprint('views', __name__)
 
@@ -9,15 +12,44 @@ views = Blueprint('views', __name__)
 def home():
     return render_template('main.html')
 
-@views.route('/posts')
+@views.route('/posts', methods=['GET','POST'])
 @login_required
 def posts():
+    if request.method == 'POST': #added code for item input
+        image = request.files['item_images']
+        title = request.form['item_title']
+        description = request.form['item_description']
+        price = request.form['item_price']
+        category = request.form['item_category']
+        condition = request.form['item_condition']
+        location = request.form['item_location']
+
+        _, ext = os.path.splitext(image.filename) #keeps file extension
+        filename = str(uuid.uuid4()) + ext #creates unique file name
+        image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename)) #code to save images to uploads folder
+
+        new_item = Item(
+            title = title,
+            description = description,
+            price = float(price),
+            category = category,
+            item_condition = condition,
+            location = location,
+            seller_id = current_user.user_id 
+        ) #item data creation
+        db.session.add(new_item)
+        db.session.commit() #saved item data to database
+
+        return redirect(url_for('views.catalog'))
+
+
     return render_template('post_creation.html') 
 
-@views.route('/catalog')
+@views.route('/catalog', methods=['GET','POST'])
 @login_required
 def catalog():
-    return render_template('catalog.html') 
+    items = Item.query.all()
+    return render_template('catalog.html', items=items) 
 
 @views.route('/map')
 @login_required
@@ -29,7 +61,7 @@ def map():
 def chats():
     return render_template('chatlog.html') 
 
-@views.route('/settings')
+@views.route('/settings', methods=['GET','POST'])
 @login_required
 def settings():
     return render_template('settings.html')
