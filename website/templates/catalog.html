@@ -6,35 +6,23 @@
 <div class="catalog-page">
     <h1 class="page-title">Browse Catalog</h1>
 
-    <!-- Category tabs -->
-    <div class="category-section">
-        <h2 class="section-title">Categories</h2>
-        <div class="category-tabs">
-            <button class="category-tab active" data-category="all">All Items</button>
-            <button class="category-tab" data-category="books">Books</button>
-            <button class="category-tab" data-category="electronics">Electronics</button>
-            <button class="category-tab" data-category="furniture">Furniture</button>
-            <button class="category-tab" data-category="clothing">Clothing</button>
-            <button class="category-tab" data-category="sports">Sports</button>
-            <button class="category-tab" data-category="kitchen">Kitchen</button>
-        </div>
-    </div>
-
     <!-- Search and filter section -->
-    <div class="search-sort-section">
+    <div class="search-filter-section">
         <div class="search-container">
             <input type="text" class="search-input" placeholder="🔍 Search items...">
             <button class="search-btn">Search</button>
         </div>
         
-        <div class="sort-container">
-            <label for="sort-select" class="sort-label">Sort by:</label>
-            <select id="sort-select" class="sort-select">
-                <option value="newest">Newest First</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="condition">Condition</option>
-                <option value="location">Location</option>
+        <div class="filter-container">
+            <label for="category-filter" class="filter-label">Filter by Category:</label>
+            <select id="category-filter" class="category-filter" name="category_filter">
+                <option value="">All Categories</option>
+                <option value="books">📚 Books</option>
+                <option value="electronics">📱 Electronics</option>
+                <option value="furniture">🪑 Furniture</option>
+                <option value="clothing">👕 Clothing</option>
+                <option value="sports">⚽ Sports</option>
+                <option value="kitchen">🍳 Kitchen</option>
             </select>
         </div>
     </div>
@@ -48,8 +36,13 @@
             {% if items %}
                 {% for item in items %}
                 <div class="item-card">
-                    <div class="item-image">
+                    <div class="item-image"> <!-- image placeholder -->
+                         {% if item.image_filename %} 
+                         <img src="{{ url_for('static', filename='uploads/' + item.image_filename) }}" 
+                            alt="{{ item.title }}" class="item-img">
+                    {% else %}
                         <div class="image-placeholder">📦</div>
+                    {% endif %}
                     </div>
                     <div class="item-info">
                         <h3 class="item-title">{{ item.title }}</h3>
@@ -95,10 +88,11 @@
             <ul class="map-item-list">
                 {% for item in items %}
                 {% if item.latitude and item.longitude %}
-                <li data-lat="{{ item.latitude }}" data-lng="{{ item.longitude }}">
-                    <strong>{{ item.title }}</strong><br>
-                    <small>{{ item.category }} • RM {{ item.price }}</small>
-                </li>
+              <li data-lat="{{ campusLocations[item.location][0] }}" 
+    data-lng="{{ campusLocations[item.location][1] }}">
+    <strong>{{ item.title }}</strong><br>
+    <small>{{ item.category }} • RM {{ item.price }}</small>
+</li>
                 {% endif %}
                 {% endfor %}
             </ul>
@@ -114,17 +108,17 @@
 <script>
 // Fixed campus locations (lat/lng for each spot)
 var campusLocations = {
-    "fom": [2.9273, 101.6420],
-    "fci": [2.9281, 101.6415],
-    "foe": [2.9270, 101.6405],
-    "fcm": [2.9268, 101.6428],
-    "library": [2.9278, 101.6419],
-    "dewan_tun_caunselor": [2.9283, 101.6430],
-    "learning_point": [2.9272, 101.6409],
-    "hostel_HB1": [2.9290, 101.6410],
-    "hostel_HB2": [2.9292, 101.6413],
-    "hostel_HB3": [2.9294, 101.6416],
-    "hostel_HB4": [2.9296, 101.6419]
+    "fcm": [2.926504, 101.642415],       // Faculty of Creative Multimedia
+    "library": [2.927640, 101.641471],   // MMU Library
+    "fci": [2.928615, 101.641042],       // Faculty of Computing & Informatics
+    "dewan_tun_caunselor": [2.928955, 101.641975],  // DTC
+    "fom": [2.929614, 101.641152],       // Faculty of Management
+    "hostel_HB1": [2.924835, 101.645800], // HB1
+    "hostel_HB2": [2.925116, 101.644993], // HB2
+    "hostel_HB3": [2.925133, 101.643928], // HB3
+    "hostel_HB4": [2.925789, 101.644312], // ✅ Correct HB4
+    "learning_point": [2.927648, 101.641938], // LP
+    "foe": [2.926475, 101.641391]        // Faculty of Engineering
 };
 
 // --- Your Leaflet map setup goes here ---
@@ -165,29 +159,32 @@ var highlightIcon = L.icon({
 var allMarkers = {};
 
 {% for item in items %}
-{% if item.latitude and item.longitude %}
-    var marker = L.marker([{{ item.latitude }}, {{ item.longitude }}], { icon: defaultIcon }).addTo(map);
+{% if item.location %}
+    var coords = campusLocations["{{ item.location }}"];
+    if (coords) {
+        var marker = L.marker(coords, { icon: defaultIcon }).addTo(map);
 
-    marker.bindPopup(`
-        <div class="popup-card">
-            <h4>{{ item.title }}</h4>
-            <p>RM {{ item.price }}</p>
-            <p>📍 {{ item.location }}</p>
-            <p>Condition: {{ item.condition }}</p>
-            <button onclick="window.location.href='/item/{{ item.id }}'">View Details</button>
-        </div>
-    `);
+        marker.bindPopup(`
+            <div class="popup-card">
+                <h4>{{ item.title }}</h4>
+                <p>RM {{ item.price }}</p>
+                <p>📍 {{ item.location }}</p>
+                <p>Condition: {{ item.condition }}</p>
+                <button onclick="window.location.href='/item/{{ item.id }}'">View Details</button>
+            </div>
+        `);
 
-    marker.on('popupopen', function () {
-        marker.setIcon(highlightIcon);
-    });
-    marker.on('popupclose', function () {
-        marker.setIcon(defaultIcon);
-    });
+        marker.on('popupopen', function () {
+            marker.setIcon(highlightIcon);
+        });
+        marker.on('popupclose', function () {
+            marker.setIcon(defaultIcon);
+        });
 
-    marker.category = "{{ item.category|lower }}";
-    marker.name = "{{ item.title|lower }}";
-    allMarkers["{{ item.title }}"] = marker;
+        marker.category = "{{ item.category|lower }}";
+        marker.name = "{{ item.title|lower }}";
+        allMarkers["{{ item.title }}"] = marker;
+    }
 {% endif %}
 {% endfor %}
 

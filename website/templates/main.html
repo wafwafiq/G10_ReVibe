@@ -10,48 +10,28 @@
         <p class="welcome-subtitle">Your MMU Community Marketplace</p>
     </div>
 
-    <!-- Quick Stats -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-number">150+</div>
-            <div class="stat-label">Active Items</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">75+</div>
-            <div class="stat-label">Happy Users</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">25+</div>
-            <div class="stat-label">Items Sold Today</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">10+</div>
-            <div class="stat-label">Categories</div>
-        </div>
-    </div>
-
     <!-- Quick Actions -->
     <div class="quick-actions">
         <h2 class="section-title">Quick Actions</h2>
         <div class="action-grid">
             <a href="{{ url_for('views.posts') }}" class="action-card">
                 <div class="action-icon">📝</div>
-                <h3>Sell an Item</h3>
+                <h3>Sell</h3>
                 <p>List your item for sale or exchange</p>
                 <span class="action-arrow">→</span>
             </a>
             
             <a href="{{ url_for('views.catalog') }}" class="action-card">
                 <div class="action-icon">🔍</div>
-                <h3>Browse Items</h3>
-                <p>Discover items from the MMU community</p>
+                <h3>Catalog</h3>
+                <p>Browse Items</p>
                 <span class="action-arrow">→</span>
             </a>
             
-            <a href="{{ url_for('views.map') }}" class="action-card">
-                <div class="action-icon">🗺️</div>
-                <h3>Explore Map</h3>
-                <p>Find items near your location on campus</p>
+            <a href="{{ url_for('views.settings') }}" class="action-card">
+                <div class="action-icon">⚙️</div>
+                <h3>Settings</h3>
+                <p>Configurate your account</p>
                 <span class="action-arrow">→</span>
             </a>
             
@@ -64,39 +44,6 @@
         </div>
     </div>
 
-    <!-- Recent Activity -->
-    <div class="recent-activity">
-        <h2 class="section-title">Recent Listings</h2>
-        <div class="activity-list">
-            {% if recent_items %}
-                {% for item in recent_items %}
-                <div class="activity-item">
-                    <div class="activity-icon">{{ item.icon or '📦' }}</div>
-                    <div class="activity-content">
-                        <h4>{{ item.name }}</h4>
-                        <p>{{ item.category }} • RM {{ item.price }} • Posted by @{{ item.seller }}</p>
-                        <span class="activity-time">{{ item.time_ago }}</span>
-                    </div>
-                    <div class="activity-status {{ item.status }}">{{ item.status.title() }}</div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <!-- Fallback content when no items exist -->
-                <div class="activity-item">
-                    <div class="activity-icon">📦</div>
-                    <div class="activity-content">
-                        <h4>Welcome to ReVibe!</h4>
-                        <p>No items posted yet. Be the first to list something!</p>
-                        <span class="activity-time">Start selling today</span>
-                    </div>
-                    <div class="activity-status active">Ready</div>
-                </div>
-            {% endif %}
-        </div>
-        
-        <div class="view-all">
-            <a href="{{ url_for('views.catalog') }}" class="btn btn-secondary">View All Items</a>
-        </div>
     </div>
 </div>
 {% endblock %}
