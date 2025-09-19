@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template , request, redirect, url_for, current_app
 from flask_login import login_required, current_user
-from .models import User, Item #import item db
+from .models import User, Item
 from . import db
 import os 
 import uuid
@@ -15,7 +15,7 @@ def home():
 @views.route('/posts', methods=['GET','POST'])
 @login_required
 def posts():
-    if request.method == 'POST': #added code for item input
+    if request.method == 'POST': 
         image = request.files['item_images']
         title = request.form['item_title']
         description = request.form['item_description']
@@ -24,9 +24,9 @@ def posts():
         condition = request.form['item_condition']
         location = request.form['item_location']
 
-        _, ext = os.path.splitext(image.filename) #keeps file extension
-        filename = str(uuid.uuid4()) + ext #creates unique file name
-        image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename)) #code to save images to uploads folder
+        _, ext = os.path.splitext(image.filename) 
+        filename = str(uuid.uuid4()) + ext 
+        image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename)) 
 
         new_item = Item(
             title = title,
@@ -36,9 +36,9 @@ def posts():
             item_condition = condition,
             location = location,
             seller_id = current_user.user_id 
-        ) #item data creation
+        )
         db.session.add(new_item)
-        db.session.commit() #saved item data to database
+        db.session.commit()
 
         return redirect(url_for('views.catalog'))
 
@@ -48,7 +48,12 @@ def posts():
 @views.route('/catalog', methods=['GET','POST'])
 @login_required
 def catalog():
-    items = Item.query.all()
+    if request.method == 'POST':
+        search_term = request.form['search']
+        items = Item.query.filter(Item.title.contains(search_term)).all()
+    else:
+        items = Item.query.all()
+
     return render_template('catalog.html', items=items) 
 
 @views.route('/map')
@@ -56,7 +61,7 @@ def catalog():
 def map():
     return ('map page')
 
-@views.route('/chat')
+@views.route('/chat',methods=['GET','POST'])
 @login_required
 def chats():
     return render_template('chatlog.html') 
