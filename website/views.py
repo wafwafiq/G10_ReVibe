@@ -59,17 +59,12 @@ def catalog():
 @views.route('/map')
 @login_required
 def map():
-    return ('map page')
+    return 'map page'
 
 @views.route('/chat',methods=['GET','POST'])
 @login_required
 def chats():
     return render_template('chatlog.html') 
-
-@views.route('/settings', methods=['GET','POST'])
-@login_required
-def settings():
-    return render_template('settings.html')
 
 @views.route('/')
 def index():
@@ -80,3 +75,32 @@ def index():
 def item_detail(item_id):
     return render_template('item_detail.html')  
 
+@views.route('/settings', methods=['GET', 'POST'])
+@login_required
+def settings():
+    if request.method == "POST":
+        if "name" in request.form and "email" in request.form:
+            # Update profile info
+            current_user.name = request.form["name"]
+            current_user.email = request.form["email"]
+            db.session.commit()
+            flash("Profile updated successfully!")
+
+        elif "current_password" in request.form:
+            current_pass = request.form["current_password"]
+            new_pass = request.form["new_password"]
+            confirm_pass = request.form["confirm_password"]
+
+            if current_user.password == current_pass:  # direct string compare
+                if new_pass == confirm_pass:
+                    current_user.password = new_pass   # store plain password
+                    db.session.commit()
+                    flash("Password updated successfully!")
+                else:
+                    flash("Passwords do not match.")
+            else:
+                flash("Current password is incorrect.")
+
+        return redirect('/settings')
+
+    return render_template("settings.html", user=current_user)

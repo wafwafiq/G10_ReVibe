@@ -2121,3 +2121,24 @@ body {
 .contact-info-note p:last-child {
     margin-bottom: 0;
 }
+
+/* Navbar always stays on top */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; /* ensure it's above map */
+}
+
+/* Body content should not hide under navbar */
+body {
+  padding-top: 70px;  /* adjust to match your navbar height */
+}
+
+/* Map takes full space below navbar */
+#map {
+  position: relative;
+  z-index: 0;
+  height: calc(100vh - 70px); /* full height minus navbar */
+}

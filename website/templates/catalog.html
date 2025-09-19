@@ -27,6 +27,7 @@
         </div>
     </div>
 
+
     <!-- Items display section -->
     <div class="items-section">
         <h2 class="section-title">Available Items</h2>
@@ -56,7 +57,7 @@
                 </div>
                 {% endfor %}
             {% else %}
-                <!-- Empty state when no items available -->
+                <!-- Empty state -->
                 <div class="empty-state">
                     <div class="empty-icon">📦</div>
                     <h3>No items available</h3>
@@ -87,10 +88,11 @@
             <ul class="map-item-list">
                 {% for item in items %}
                 {% if item.latitude and item.longitude %}
-                <li data-lat="{{ item.latitude }}" data-lng="{{ item.longitude }}">
-                    <strong>{{ item.title }}</strong><br>
-                    <small>{{ item.category }} • RM {{ item.price }}</small>
-                </li>
+              <li data-lat="{{ campusLocations[item.location][0] }}" 
+    data-lng="{{ campusLocations[item.location][1] }}">
+    <strong>{{ item.title }}</strong><br>
+    <small>{{ item.category }} • RM {{ item.price }}</small>
+</li>
                 {% endif %}
                 {% endfor %}
             </ul>
@@ -100,84 +102,126 @@
         <div id="map"></div>
     </div>
 </div>
-
 {% endblock %}
+
 {% block scripts %}
 <script>
-    // Initialize map (locked to MMU Cyberjaya location)
-    var map = L.map('map', {
-        center: [2.927673, 101.641924], // your link coords
-        zoom: 18,
-        dragging: false,
-        zoomControl: false,
-        scrollWheelZoom: false,
-        doubleClickZoom: false,
-        boxZoom: false,
-        keyboard: false,
-        touchZoom: false
-    });
+// Fixed campus locations (lat/lng for each spot)
+var campusLocations = {
+    "fcm": [2.926504, 101.642415],       // Faculty of Creative Multimedia
+    "library": [2.927640, 101.641471],   // MMU Library
+    "fci": [2.928615, 101.641042],       // Faculty of Computing & Informatics
+    "dewan_tun_caunselor": [2.928955, 101.641975],  // DTC
+    "fom": [2.929614, 101.641152],       // Faculty of Management
+    "hostel_HB1": [2.924835, 101.645800], // HB1
+    "hostel_HB2": [2.925116, 101.644993], // HB2
+    "hostel_HB3": [2.925133, 101.643928], // HB3
+    "hostel_HB4": [2.925789, 101.644312], // ✅ Correct HB4
+    "learning_point": [2.927648, 101.641938], // LP
+    "foe": [2.926475, 101.641391]        // Faculty of Engineering
+};
 
-    // Add tiles (OpenStreetMap)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 17,
-        minZoom: 16, // prevents zooming out
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+// --- Your Leaflet map setup goes here ---
+var map = L.map('map', {
+    center: [2.927673, 101.641924], // MMU Cyberjaya
+    zoom: 18,
+    zoomControl: true
+});
 
-    // Store markers
-    var allMarkers = {};
+// Restrict to MMU bounding box
+var bounds = [
+    [2.9255, 101.6395],
+    [2.9298, 101.6440]
+];
+map.setMaxBounds(bounds);
+map.on('drag', function () {
+    map.panInsideBounds(bounds, { animate: true });
+});
 
-    {% for item in items %}
-        {% if item.latitude and item.longitude %}
-            var marker = L.marker([{{ item.latitude }}, {{ item.longitude }}])
-                .bindPopup("<b>{{ item.title }}</b><br>RM {{ item.price }}<br>{{ item.location }}")
-                .addTo(map);
+// Add tiles
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 17,
+    minZoom: 16,
+    attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
 
-            marker.category = "{{ item.category|lower }}";
-            marker.name = "{{ item.title|lower }}";
-            allMarkers["{{ item.title }}"] = marker;
-        {% endif %}
-    {% endfor %}
+// Marker icons
+var defaultIcon = L.icon({
+    iconUrl: 'https://unpkg.com/leaflet/dist/images/marker-icon.png',
+    shadowUrl: 'https://unpkg.com/leaflet/dist/images/marker-shadow.png'
+});
+var highlightIcon = L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+    shadowUrl: 'https://unpkg.com/leaflet/dist/images/marker-shadow.png'
+});
 
-    // Update markers function (filters by category + search)
-    function updateMarkers(selectedCategory, searchTerm) {
-        searchTerm = searchTerm.toLowerCase();
+// Store markers
+var allMarkers = {};
 
-        Object.values(allMarkers).forEach(marker => {
-            const matchesCategory = (selectedCategory === "all" || marker.category === selectedCategory);
-            const matchesSearch = marker.name.includes(searchTerm);
+{% for item in items %}
+{% if item.location %}
+    var coords = campusLocations["{{ item.location }}"];
+    if (coords) {
+        var marker = L.marker(coords, { icon: defaultIcon }).addTo(map);
 
-            if (matchesCategory && matchesSearch) {
-                if (!map.hasLayer(marker)) marker.addTo(map);
-            } else {
-                if (map.hasLayer(marker)) map.removeLayer(marker);
-            }
+        marker.bindPopup(`
+            <div class="popup-card">
+                <h4>{{ item.title }}</h4>
+                <p>RM {{ item.price }}</p>
+                <p>📍 {{ item.location }}</p>
+                <p>Condition: {{ item.condition }}</p>
+                <button onclick="window.location.href='/item/{{ item.id }}'">View Details</button>
+            </div>
+        `);
+
+        marker.on('popupopen', function () {
+            marker.setIcon(highlightIcon);
         });
+        marker.on('popupclose', function () {
+            marker.setIcon(defaultIcon);
+        });
+
+        marker.category = "{{ item.category|lower }}";
+        marker.name = "{{ item.title|lower }}";
+        allMarkers["{{ item.title }}"] = marker;
     }
+{% endif %}
+{% endfor %}
 
-    // Hook up category filter
-    document.getElementById("map-category").addEventListener("change", function() {
-        updateMarkers(this.value, document.getElementById("map-search").value);
+// --- Filtering logic same as before ---
+function updateMarkers(selectedCategory, searchTerm) {
+    searchTerm = searchTerm.toLowerCase();
+    Object.values(allMarkers).forEach(marker => {
+        const matchesCategory = (selectedCategory === "all" || marker.category === selectedCategory);
+        const matchesSearch = marker.name.includes(searchTerm);
+        if (matchesCategory && matchesSearch) {
+            if (!map.hasLayer(marker)) marker.addTo(map);
+        } else {
+            if (map.hasLayer(marker)) map.removeLayer(marker);
+        }
     });
+}
 
-    // Hook up search filter
-    document.getElementById("map-search").addEventListener("input", function() {
-        updateMarkers(document.getElementById("map-category").value, this.value);
-    });
+document.getElementById("map-category").addEventListener("change", function() {
+    updateMarkers(this.value, document.getElementById("map-search").value);
+});
+document.getElementById("map-search").addEventListener("input", function() {
+    updateMarkers(document.getElementById("map-category").value, this.value);
+});
 
-    // Sidebar item → focus marker popup
-    document.querySelectorAll('.map-item-list li').forEach(li => {
-        li.addEventListener('click', () => {
-            let lat = li.dataset.lat;
-            let lng = li.dataset.lng;
-            let title = li.querySelector('strong').textContent;
-            if (lat && lng) {
-                map.setView([lat, lng], 18); // keep zoom fixed
-                if (allMarkers[title]) {
-                    allMarkers[title].openPopup();
-                }
+// Sidebar → focus marker
+document.querySelectorAll('.map-item-list li').forEach(li => {
+    li.addEventListener('click', () => {
+        let lat = li.dataset.lat;
+        let lng = li.dataset.lng;
+        let title = li.querySelector('strong').textContent;
+        if (lat && lng) {
+            map.setView([lat, lng], 18);
+            if (allMarkers[title]) {
+                allMarkers[title].openPopup();
             }
-        });
+        }
     });
+});
 </script>
 {% endblock %}
