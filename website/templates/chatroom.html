@@ -47,7 +47,7 @@
             
             <!-- Quick actions to view full details-->
             <div class="context-actions">
-                <a href="{{ url_for('views.item_detail', item_id=item.id) if item else '#' }}" 
+                <a href="{{ url_for('views.item_detail', item_id=item.item_id) if item else '#' }}" 
                    class="view-item-btn">
                     View Full Details
                 </a>
@@ -106,7 +106,7 @@
     
     <!-- Message Input Form - Send new messages -->
     <div class="message-input-container">
-        <form class="message-form" method="POST" action="{{ url_for('views.send_message', item_id=item.id) if item else '#' }}">
+        <form class="message-form" method="POST" action="{{ url_for('views.send_message', item_id=item.item_id) if item else '#' }}">
             <!-- Message input area -->
             <div class="input-group">
                 <textarea 

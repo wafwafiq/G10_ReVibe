@@ -27,7 +27,7 @@
             <div class="thumbnail-gallery">
                 {% if item.images %}
                     {% for image in item.images %}
-                    <img src="{{ image }}" alt="Item photo {{ loop.index }}" class="thumbnail" onclick="changeMainImage(this.src)">
+                    <img src="{{ image }}" alt="Item photo {{ loop.index }}" class="thumbnail">
                     {% endfor %}
                 {% endif %}
             </div>
@@ -97,9 +97,9 @@
 
             <!-- Contact Actions -->
             <div class="contact-actions">
-                <button class="btn-contact-seller" onclick="contactSeller({{ item.id }})">
+                <a href="{{ url_for('views.chats') }}" class="btn-contact-seller">
                     💬 Contact Seller
-                </button>
+                </a>
                 <p class="contact-note">
                     You'll be redirected to chat with the seller
                 </p>
@@ -128,19 +128,4 @@
     {% endif %}
 </div>
 
-<script>
-// Simple image gallery functionality
-function changeMainImage(newSrc) {
-    const mainImage = document.getElementById('main-image');
-    if (mainImage) {
-        mainImage.src = newSrc;
-    }
-}
-
-// Contact seller functionality(chat later)
-function contactSeller(itemId) {
-    // chat page later
-    console.log('Contact seller for item ID:', itemId);
-}
-</script>
 {% endblock %}
