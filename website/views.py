@@ -72,8 +72,10 @@ def index():
     return '<br>'.join([f"{u.user_id} - {u.name} ({u.email})" for u in users])
 
 @views.route('/item/<int:item_id>')
+@login_required
 def item_detail(item_id):
-    return render_template('item_detail.html')  
+    item = Item.query.get_or_404(item_id)
+    return render_template('item_detail.html', item=item)  # added by adam
 
 @views.route('/settings', methods=['GET', 'POST'])
 @login_required

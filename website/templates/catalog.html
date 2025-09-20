@@ -48,11 +48,11 @@
                         <h3 class="item-title">{{ item.title }}</h3>
                         <p class="item-price">RM {{ item.price }}</p>
                         <p class="item-location">📍 {{ item.location }}</p>
-                        <p class="item-condition">Condition: {{ item.condition }}</p>
-                        <p class="item-time">Posted {{ item.time_ago }}</p>
+                        <p class="item-condition">Condition: {{ item.item_condition }}</p>
+                        <p class="item-time">Posted {{ item.created_at.strftime('%B %d, %Y') }}</p>
                     </div>
                     <div class="item-actions">
-                        <button class="view-details-btn">View Details</button>
+                        <a href="{{ url_for('views.item_detail', item_id=item.item_id) }}" class="view-details-btn">View Details</a>
                     </div>
                 </div>
                 {% endfor %}
@@ -169,7 +169,7 @@ var allMarkers = {};
                 <h4>{{ item.title }}</h4>
                 <p>RM {{ item.price }}</p>
                 <p>📍 {{ item.location }}</p>
-                <p>Condition: {{ item.condition }}</p>
+                <p>Condition: {{ item.item_condition }}</p>
                 <button onclick="window.location.href='/item/{{ item.id }}'">View Details</button>
             </div>
         `);
