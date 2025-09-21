@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Item - ReVibe{% endblock %}
+
+{% block content %}
+<div class="post-creation-page">
+    <div class="post-header">
+        <h1 class="page-title">Edit Item</h1>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="post-form">
+        <!-- CSRF_TOKEN_PLACEHOLDER -->
+        
+        <!-- Upload images -->
+        <div class="form-section">
+            <h3 class="section-title">📸 Photos</h3>
+            <div class="image-upload-container">
+                <!-- File input for new photos -->
+                <input type="file" id="item-images" name="item_images" accept="image/*" class="image-input">
+                <label for="item-images" class="image-upload-label">
+                    <div class="upload-icon">📷</div>
+                    <p>upload photos</p>
+                    <small>Upload up to a photo (JPG, PNG, max 10MB )</small>
+                </label>
+                <div class="image-preview-container">
+                    <!-- Images will be shown here with delete buttons -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Basic info -->
+        <div class="form-section">
+            <h3 class="section-title">📦 Item Details</h3>
+            
+            <div class="form-group">
+                <label for="item-title" class="form-label">Item Title *</label>
+                <input 
+                    type="text" 
+                    id="item-title" 
+                    name="item_title" 
+                    class="form-input" 
+                    required
+                    maxlength="255"
+                    value="{{ item.title if item else '' }}"
+                >
+                <small class="form-note">Be specific and descriptive</small>
+            </div>
+
+            <div class="form-group">
+                <label for="item-description" class="form-label">Description *</label>
+                <textarea 
+                    id="item-description" 
+                    name="item_description" 
+                    class="form-input" 
+                    required
+                    rows="10"
+                    maxlength="1000"
+                >{{ item.description if item else '' }}</textarea>
+                <small class="form-note">Include condition details, what's included, and any defects</small>
+            </div>
+
+            <div class="form-row">
+                <!-- Price Field - maps to 'price' column (DECIMAL 10,2) -->
+                <div class="form-group">
+                    <label for="item-price" class="form-label">Price (RM) *</label>
+                    <input 
+                        type="number" 
+                        id="item-price" 
+                        name="item_price" 
+                        class="form-input" 
+                        required
+                        min="0"
+                        step="0.01"
+                        max="99999.99"
+                        value="{{ item.price if item else '' }}"
+                    >
+                    <small class="form-note">Set a fair price (max RM 99,999.99)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="item-category" class="form-label">Category *</label>
+                    <select id="item-category" name="item_category" class="form-select" required>
+                        {% set c = (item.category if item else '')|lower %}
+                        <option value="">Select Category</option>
+                        <option value="books" {{ 'selected' if c == 'books' else '' }}>Books</option>
+                        <option value="electronics" {{ 'selected' if c == 'electronics' else '' }}>Electronics</option>
+                        <option value="furniture" {{ 'selected' if c == 'furniture' else '' }}> Furniture</option>
+                        <option value="clothing" {{ 'selected' if c == 'clothing' else '' }}>Clothing</option>
+                        <option value="sports" {{ 'selected' if c == 'sports' else '' }}>Sports</option>
+                        <option value="kitchen" {{ 'selected' if c == 'kitchen' else '' }}> Kitchen</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Item Condition -->
+        <div class="form-section">
+            <h3 class="section-title">⭐ Item Condition</h3>
+            
+            <div class="form-group">
+                <label for="item-condition" class="form-label">Condition *</label>
+                <select id="item-condition" name="item_condition" class="form-select" required>
+                    <!-- Get current condition value and convert to lowercase for comparison -->
+                    {% set current_condition = (item.item_condition if item else '')|lower %}
+                    
+                    <option value="">Select condition</option>
+                    <option value="new" {{ 'selected' if current_condition == 'new' else '' }}>✨ New - Brand new, unused, with original packaging</option>
+                    <option value="used" {{ 'selected' if current_condition == 'used' else '' }}>👍 Used - Used but well maintained, minor wear</option>
+                    <option value="refurbished" {{ 'selected' if current_condition == 'refurbished' else '' }}>⚠️ refurbished - Shows signs of use, may have defects</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Pickup Location -->
+        <div class="form-section">
+            <h3 class="section-title">📍 Pickup Location</h3>
+            
+            <div class="form-group">
+                <label for="item-location" class="form-label">Location *</label>
+                <select id="item-location" name="item_location" class="form-select" required>
+                    <!-- Get current location value and convert to lowercase for comparison -->
+                    {% set current_location = (item.location if item else '')|lower %}
+                    
+                    <option value="">Select pickup location</option>
+                    
+                    <!-- MMU Locations -->
+                    <optgroup label="📍 MMU Cyberjaya Locations">
+                        <option value="fom" {{ 'selected' if current_location == 'fom' else '' }}>🏫 Faculty of Management (FOM)</option>
+                        <option value="foe" {{ 'selected' if current_location == 'foe' else '' }}>🏫 Faculty of Engineering (FOE)</option>
+                        <option value="fci" {{ 'selected' if current_location == 'fci' else '' }}>🏫 Faculty of Computer and Informatics (FCI)</option>
+                        <option value="fcm" {{ 'selected' if current_location == 'fcm' else '' }}>🏫 Faculty of Creative Multimedia (FCM)</option>
+                        <option value="library" {{ 'selected' if current_location == 'library' else '' }}>📚 MMU Library</option>
+                        <option value="dewan_tun_caunselor" {{ 'selected' if current_location == 'dewan_tun_caunselor' else '' }}>🎓 DTC entrance </option>
+                        <option value="learning_point" {{ 'selected' if current_location == 'learning_point' else '' }}>🚪LP Main Entrance</option>
+                        <option value="hostel_HB1" {{ 'selected' if current_location == 'hostel_hb1' else '' }}>🏠 HB1 LOBBY</option>
+                        <option value="hostel_HB2" {{ 'selected' if current_location == 'hostel_hb2' else '' }}>🏠 HB2 LOBBY</option>
+                        <option value="hostel_HB3" {{ 'selected' if current_location == 'hostel_hb3' else '' }}>🏠 HB3 LOBBY</option>
+                        <option value="hostel_HB4" {{ 'selected' if current_location == 'hostel_hb4' else '' }}>🏠 HB4 LOBBY</option>
+                    </optgroup>
+                </select>
+                <small class="form-note">For meetup</small>
+            </div>
+        </div>
+        <!-- Contact Information -->
+        <div class="form-section">
+            <h3 class="section-title">📞Contact</h3>
+            <div class="contact-info-note">
+                <p>✅ Buyers will continue to contact you through ReVibe's secure messaging system</p>
+                <p>✅ Your contact information remains the same as when you created this post</p>
+                <p>✅ Meet safely in public campus locations</p>
+            </div>
+        </div>
+
+        <!-- ========================================
+             FORM ACTION BUTTONS
+             Save Changes instead of Post - different from post_creation.html
+             ======================================== -->
+        <div class="form-actions">
+            <a href="{{ url_for('views.home') }}" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-primary">Save Changes</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

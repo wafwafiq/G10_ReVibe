@@ -44,6 +44,72 @@
         </div>
     </div>
 
+    <!-- ========================================
+         YOUR POSTS SECTION
+         Shows current user's listed items in catalog-style grid
+         ======================================== -->
+    <div class="items-section">
+        <h2 class="section-title">Your Posts</h2>
+        
+        <div class="items-grid">
+            <!-- Check if user is logged in and has items -->
+            {% if current_user.is_authenticated and current_user.items %}
+                <!-- Loop through each item belonging to current user -->
+                {% for item in current_user.items %}
+                <div class="item-card">
+                    <!-- Item image placeholder (no image_filename field in database) -->
+                    <div class="item-image">
+                        <div class="image-placeholder">📦</div>
+                    </div>
+                    
+                    <!-- Item information display -->
+                    <div class="item-info">
+                        <!-- Item title from database -->
+                        <h3 class="item-title">{{ item.title }}</h3>
+                        
+                        <!-- Price formatted with RM prefix -->
+                        <p class="item-price">RM {{ item.price }}</p>
+                        
+                        <!-- Location with emoji icon -->
+                        <p class="item-location">📍 {{ item.location }}</p>
+                        
+                        <!-- Condition from enum field -->
+                        <p class="item-condition">Condition: {{ item.item_condition }}</p>
+                        
+                        <!-- Posted date formatted -->
+                        <p class="item-time">Posted {{ item.created_at.strftime('%B %d, %Y') }}</p>
+                    </div>
+                    
+                    <!-- Action buttons for each item -->
+                    <div class="item-actions">
+                        <!-- View Details button - links to item detail page -->
+                        <a href="{{ url_for('views.item_detail', item_id=item.item_id) }}" class="view-details-btn">
+                            View Details
+                        </a>
+                        
+                        <!-- Edit button - placeholder until backend route is ready -->
+                        <a href="#" class="view-details-btn" style="margin-top:0.5rem; background:#6B7280;" title="Edit functionality coming soon">
+                            Edit
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Empty state when user has no posts -->
+                <div class="empty-state">
+                    <div class="empty-icon">🗂️</div>
+                    <h3>No posts yet</h3>
+                    <p>Items you list will appear here for easy management.</p>
+                    
+                    <!-- Quick link to create first post -->
+                    <a href="{{ url_for('views.posts') }}" class="btn-primary" style="margin-top: 1rem; display: inline-block;">
+                        Create Your First Post
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
     </div>
 </div>
 {% endblock %}
