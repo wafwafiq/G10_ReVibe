@@ -85,10 +85,8 @@
                 <option value="sports">Sports</option>
                 <option value="kitchen">Kitchen</option>
             </select>
-            <!-- Initially empty -->
-            <ul class="map-item-list" id="map-item-list">
-                <li><em>Click a marker to see items here</em></li>
-            </ul>
+            <!-- Sidebar list -->
+            <ul class="map-item-list" id="map-item-list"></ul>
         </div>
 
         <!-- Map -->
@@ -99,7 +97,7 @@
 
 {% block scripts %}
 <script>
-// Fixed campus locations (lat/lng for each spot)
+// === Campus coordinates ===
 var campusLocations = {
     "fcm": [2.926504, 101.642415],
     "library": [2.927640, 101.641471],
@@ -114,14 +112,12 @@ var campusLocations = {
     "foe": [2.926475, 101.641391]
 };
 
-// --- Map setup ---
+// === Map setup ===
 var map = L.map('map', {
     center: [2.927673, 101.641924],
     zoom: 18,
     zoomControl: true
 });
-
-// Restrict map bounds
 var bounds = [
     [2.9255, 101.6395],
     [2.9298, 101.6440]
@@ -130,15 +126,13 @@ map.setMaxBounds(bounds);
 map.on('drag', function () {
     map.panInsideBounds(bounds, { animate: true });
 });
-
-// Add tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 17,
     minZoom: 16,
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-// Marker icons
+// === Icons ===
 var defaultIcon = L.icon({
     iconUrl: 'https://unpkg.com/leaflet/dist/images/marker-icon.png',
     shadowUrl: 'https://unpkg.com/leaflet/dist/images/marker-shadow.png'
@@ -148,10 +142,11 @@ var highlightIcon = L.icon({
     shadowUrl: 'https://unpkg.com/leaflet/dist/images/marker-shadow.png'
 });
 
-// Store markers
+// === Data structures ===
 var allMarkers = {};
-
-// --- Group items by location ---
+var activeMarker = null;
+var selectedCategory = "all";
+var searchTerm = "";
 var locationGroups = {};
 
 {% for item in items %}
@@ -164,86 +159,46 @@ var locationGroups = {};
         id: "{{ item.item_id }}",
         title: "{{ item.title }}",
         price: "{{ item.price }}",
-        category: "{{ item.category }}",
-        condition: "{{ item.item_condition }}"
+        category: "{{ item.category|lower }}",
+        condition: "{{ item.item_condition }}",
+        image: "{{ item.images[0] if item.images else '' }}"
     });
 {% endif %}
 {% endfor %}
 
-// --- Create one marker per location ---
-for (var loc in locationGroups) {
-    var coords = campusLocations[loc];
-    if (coords) {
-        var marker = L.marker(coords, { icon: defaultIcon }).addTo(map);
+// === Sidebar rendering with filters ===
+function renderSidebar(items) {
+    var sidebarList = document.getElementById("map-item-list");
+    sidebarList.innerHTML = "";
 
-        marker.on('click', function(e) {
-            var clickedLoc = loc; // closure issue fix below
-        });
+    // Apply filters
+    let filteredItems = items.filter(item => {
+        const matchesCategory = (selectedCategory === "all" || item.category === selectedCategory);
+        const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
 
-        // Use closure to capture location properly
-        (function(locationName, items) {
-            marker.on('click', function() {
-                // Build sidebar list
-                var sidebarList = document.getElementById("map-item-list");
-                sidebarList.innerHTML = ""; // clear
-
-                items.forEach(function(item) {
-                    var li = document.createElement("li");
-                    li.innerHTML = `
-                        <strong>${item.title}</strong><br>
-                        <small>${item.category} • RM ${item.price}</small><br>
-                        <button onclick="window.location.href='/item/${item.id}'">View Details</button>
-                    `;
-                    sidebarList.appendChild(li);
-                });
-            });
-
-            // Bind popup as well
-            var popupContent = "<div class='popup-card'><h4>📍 " + locationName + "</h4><p>Click marker to see items in sidebar.</p></div>";
-            marker.bindPopup(popupContent);
-
-            // Highlight on open
-            marker.on('popupopen', function () {
-                marker.setIcon(highlightIcon);
-            });
-            marker.on('popupclose', function () {
-                marker.setIcon(defaultIcon);
-            });
-
-            allMarkers[locationName] = marker;
-        })(loc, locationGroups[loc]);
+    if (filteredItems.length === 0) {
+        sidebarList.innerHTML = "<li><em>No matching items</em></li>";
+        return;
     }
-}
 
-// --- Filtering ---
-function updateMarkers(selectedCategory, searchTerm) {
-    searchTerm = searchTerm.toLowerCase();
-    Object.entries(locationGroups).forEach(([loc, items]) => {
-        let marker = allMarkers[loc];
-        let matches = items.some(item => {
-            const matchesCategory = (selectedCategory === "all" || item.category.toLowerCase() === selectedCategory);
-            const matchesSearch = item.title.toLowerCase().includes(searchTerm);
-            return matchesCategory && matchesSearch;
-        });
-        if (matches) {
-            if (!map.hasLayer(marker)) marker.addTo(map);
-        } else {
-            if (map.hasLayer(marker)) map.removeLayer(marker);
-        }
+    // Build cards
+    filteredItems.forEach(function(item) {
+        var li = document.createElement("li");
+        li.style.backgroundImage = item.image ? `url('${item.image}')` : "linear-gradient(#eee, #ccc)";
+        li.innerHTML = `
+    <div>
+        <strong>${item.title}</strong>
+        <small>${item.category} • RM ${item.price}</small>
+        <button onclick="window.location.href='/item/${item.id}'">View Details</button>
+    </div>
+`;
+        sidebarList.appendChild(li);
     });
 }
 
-document.getElementById("map-category").addEventListener("change", function() {
-    updateMarkers(this.value, document.getElementById("map-search").value);
-});
-document.getElementById("map-search").addEventListener("input", function() {
-    updateMarkers(document.getElementById("map-category").value, this.value);
-});
-
-// Track active marker
-var activeMarker = null;
-
-// --- Create one marker per location ---
+// === Create markers and bind sidebar toggle ===
 for (var loc in locationGroups) {
     var coords = campusLocations[loc];
     if (coords) {
@@ -251,42 +206,56 @@ for (var loc in locationGroups) {
 
         (function(locationName, items, markerRef) {
             markerRef.on('click', function() {
-                var sidebarList = document.getElementById("map-item-list");
-
-                // If this marker is already active, clear sidebar + deactivate
                 if (activeMarker === markerRef) {
-                    sidebarList.innerHTML = "<li><em>Click a marker to see items here</em></li>";
+                    document.getElementById("map-item-list").innerHTML = "";
+                    activeMarker.setIcon(defaultIcon);
                     activeMarker = null;
-                    markerRef.setIcon(defaultIcon);
                 } else {
-                    // Otherwise, fill sidebar with this location’s items
-                    sidebarList.innerHTML = "";
-                    items.forEach(function(item) {
-                        var li = document.createElement("li");
-                        li.innerHTML = `
-                            <strong>${item.title}</strong><br>
-                            <small>${item.category} • RM ${item.price}</small><br>
-                            <button onclick="window.location.href='/item/${item.id}'">View Details</button>
-                        `;
-                        sidebarList.appendChild(li);
-                    });
-
-                    // Reset previously active marker
-                    if (activeMarker) {
-                        activeMarker.setIcon(defaultIcon);
-                    }
+                    renderSidebar(items);
+                    if (activeMarker) activeMarker.setIcon(defaultIcon);
                     activeMarker = markerRef;
                     markerRef.setIcon(highlightIcon);
                 }
             });
-
-            // Simple popup hint
-            var popupContent = "<div class='popup-card'><h4>📍 " + locationName + "</h4><p>HB4.</p></div>";
-            markerRef.bindPopup(popupContent);
-
             allMarkers[locationName] = markerRef;
         })(loc, locationGroups[loc], marker);
     }
 }
+
+// === Filtering logic ===
+function updateMarkers() {
+    Object.entries(locationGroups).forEach(([loc, items]) => {
+        let marker = allMarkers[loc];
+        let matches = items.some(item => {
+            const matchesCategory = (selectedCategory === "all" || item.category.toLowerCase() === selectedCategory);
+            const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
+            return matchesCategory && matchesSearch;
+        });
+
+        if (matches) {
+            if (!map.hasLayer(marker)) marker.addTo(map);
+        } else {
+            if (map.hasLayer(marker)) map.removeLayer(marker);
+        }
+    });
+
+    // 🔑 Re-render the sidebar if a marker is active
+    if (activeMarker) {
+        let activeLoc = Object.keys(allMarkers).find(key => allMarkers[key] === activeMarker);
+        if (activeLoc) {
+            renderSidebar(locationGroups[activeLoc]);  // This applies filtering again
+        }
+    }
+}
+
+document.getElementById("map-category").addEventListener("change", function() {
+    selectedCategory = this.value;
+    updateMarkers();
+});
+document.getElementById("map-search").addEventListener("input", function() {
+    searchTerm = this.value;
+    updateMarkers();
+});
 </script>
 {% endblock %}
+
