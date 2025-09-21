@@ -60,7 +60,7 @@ def catalog():
 @views.route('/map')
 @login_required
 def map():
-    return 'map page'
+    return  render_template('catalog.html')#redirect to catalog/map page
 
 @views.route('/chat',methods=['GET','POST'])
 @login_required
