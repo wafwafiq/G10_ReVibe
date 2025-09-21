@@ -85,16 +85,9 @@
                 <option value="sports">Sports</option>
                 <option value="kitchen">Kitchen</option>
             </select>
-            <ul class="map-item-list">
-                {% for item in items %}
-                {% if item.latitude and item.longitude %}
-              <li data-lat="{{ campusLocations[item.location][0] }}" 
-    data-lng="{{ campusLocations[item.location][1] }}">
-    <strong>{{ item.title }}</strong><br>
-    <small>{{ item.category }} • RM {{ item.price }}</small>
-</li>
-                {% endif %}
-                {% endfor %}
+            <!-- Initially empty -->
+            <ul class="map-item-list" id="map-item-list">
+                <li><em>Click a marker to see items here</em></li>
             </ul>
         </div>
 
@@ -108,27 +101,27 @@
 <script>
 // Fixed campus locations (lat/lng for each spot)
 var campusLocations = {
-    "fcm": [2.926504, 101.642415],       // Faculty of Creative Multimedia
-    "library": [2.927640, 101.641471],   // MMU Library
-    "fci": [2.928615, 101.641042],       // Faculty of Computing & Informatics
-    "dewan_tun_caunselor": [2.928955, 101.641975],  // DTC
-    "fom": [2.929614, 101.641152],       // Faculty of Management
-    "hostel_HB1": [2.924835, 101.645800], // HB1
-    "hostel_HB2": [2.925116, 101.644993], // HB2
-    "hostel_HB3": [2.925133, 101.643928], // HB3
-    "hostel_HB4": [2.925789, 101.644312], // ✅ Correct HB4
-    "learning_point": [2.927648, 101.641938], // LP
-    "foe": [2.926475, 101.641391]        // Faculty of Engineering
+    "fcm": [2.926504, 101.642415],
+    "library": [2.927640, 101.641471],
+    "fci": [2.928615, 101.641042],
+    "dewan_tun_caunselor": [2.928955, 101.641975],
+    "fom": [2.929614, 101.641152],
+    "hostel_HB1": [2.924835, 101.645800],
+    "hostel_HB2": [2.925116, 101.644993],
+    "hostel_HB3": [2.925133, 101.643928],
+    "hostel_HB4": [2.925789, 101.644312],
+    "learning_point": [2.927648, 101.641938],
+    "foe": [2.926475, 101.641391]
 };
 
-// --- Your Leaflet map setup goes here ---
+// --- Map setup ---
 var map = L.map('map', {
-    center: [2.927673, 101.641924], // MMU Cyberjaya
+    center: [2.927673, 101.641924],
     zoom: 18,
     zoomControl: true
 });
 
-// Restrict to MMU bounding box
+// Restrict map bounds
 var bounds = [
     [2.9255, 101.6395],
     [2.9298, 101.6440]
@@ -158,43 +151,81 @@ var highlightIcon = L.icon({
 // Store markers
 var allMarkers = {};
 
+// --- Group items by location ---
+var locationGroups = {};
+
 {% for item in items %}
 {% if item.location %}
-    var coords = campusLocations["{{ item.location }}"];
-    if (coords) {
-        var marker = L.marker(coords, { icon: defaultIcon }).addTo(map);
-
-        marker.bindPopup(`
-            <div class="popup-card">
-                <h4>{{ item.title }}</h4>
-                <p>RM {{ item.price }}</p>
-                <p>📍 {{ item.location }}</p>
-                <p>Condition: {{ item.item_condition }}</p>
-                <button onclick="window.location.href='/item/{{ item.item_id }}'">View Details</button>
-            </div>
-        `);
-
-        marker.on('popupopen', function () {
-            marker.setIcon(highlightIcon);
-        });
-        marker.on('popupclose', function () {
-            marker.setIcon(defaultIcon);
-        });
-
-        marker.category = "{{ item.category|lower }}";
-        marker.name = "{{ item.title|lower }}";
-        allMarkers["{{ item.title }}"] = marker;
+    var loc = "{{ item.location }}";
+    if (!locationGroups[loc]) {
+        locationGroups[loc] = [];
     }
+    locationGroups[loc].push({
+        id: "{{ item.item_id }}",
+        title: "{{ item.title }}",
+        price: "{{ item.price }}",
+        category: "{{ item.category }}",
+        condition: "{{ item.item_condition }}"
+    });
 {% endif %}
 {% endfor %}
 
-// --- Filtering logic same as before ---
+// --- Create one marker per location ---
+for (var loc in locationGroups) {
+    var coords = campusLocations[loc];
+    if (coords) {
+        var marker = L.marker(coords, { icon: defaultIcon }).addTo(map);
+
+        marker.on('click', function(e) {
+            var clickedLoc = loc; // closure issue fix below
+        });
+
+        // Use closure to capture location properly
+        (function(locationName, items) {
+            marker.on('click', function() {
+                // Build sidebar list
+                var sidebarList = document.getElementById("map-item-list");
+                sidebarList.innerHTML = ""; // clear
+
+                items.forEach(function(item) {
+                    var li = document.createElement("li");
+                    li.innerHTML = `
+                        <strong>${item.title}</strong><br>
+                        <small>${item.category} • RM ${item.price}</small><br>
+                        <button onclick="window.location.href='/item/${item.id}'">View Details</button>
+                    `;
+                    sidebarList.appendChild(li);
+                });
+            });
+
+            // Bind popup as well
+            var popupContent = "<div class='popup-card'><h4>📍 " + locationName + "</h4><p>Click marker to see items in sidebar.</p></div>";
+            marker.bindPopup(popupContent);
+
+            // Highlight on open
+            marker.on('popupopen', function () {
+                marker.setIcon(highlightIcon);
+            });
+            marker.on('popupclose', function () {
+                marker.setIcon(defaultIcon);
+            });
+
+            allMarkers[locationName] = marker;
+        })(loc, locationGroups[loc]);
+    }
+}
+
+// --- Filtering ---
 function updateMarkers(selectedCategory, searchTerm) {
     searchTerm = searchTerm.toLowerCase();
-    Object.values(allMarkers).forEach(marker => {
-        const matchesCategory = (selectedCategory === "all" || marker.category === selectedCategory);
-        const matchesSearch = marker.name.includes(searchTerm);
-        if (matchesCategory && matchesSearch) {
+    Object.entries(locationGroups).forEach(([loc, items]) => {
+        let marker = allMarkers[loc];
+        let matches = items.some(item => {
+            const matchesCategory = (selectedCategory === "all" || item.category.toLowerCase() === selectedCategory);
+            const matchesSearch = item.title.toLowerCase().includes(searchTerm);
+            return matchesCategory && matchesSearch;
+        });
+        if (matches) {
             if (!map.hasLayer(marker)) marker.addTo(map);
         } else {
             if (map.hasLayer(marker)) map.removeLayer(marker);
@@ -209,19 +240,53 @@ document.getElementById("map-search").addEventListener("input", function() {
     updateMarkers(document.getElementById("map-category").value, this.value);
 });
 
-// Sidebar → focus marker
-document.querySelectorAll('.map-item-list li').forEach(li => {
-    li.addEventListener('click', () => {
-        let lat = li.dataset.lat;
-        let lng = li.dataset.lng;
-        let title = li.querySelector('strong').textContent;
-        if (lat && lng) {
-            map.setView([lat, lng], 18);
-            if (allMarkers[title]) {
-                allMarkers[title].openPopup();
-            }
-        }
-    });
-});
+// Track active marker
+var activeMarker = null;
+
+// --- Create one marker per location ---
+for (var loc in locationGroups) {
+    var coords = campusLocations[loc];
+    if (coords) {
+        var marker = L.marker(coords, { icon: defaultIcon }).addTo(map);
+
+        (function(locationName, items, markerRef) {
+            markerRef.on('click', function() {
+                var sidebarList = document.getElementById("map-item-list");
+
+                // If this marker is already active, clear sidebar + deactivate
+                if (activeMarker === markerRef) {
+                    sidebarList.innerHTML = "<li><em>Click a marker to see items here</em></li>";
+                    activeMarker = null;
+                    markerRef.setIcon(defaultIcon);
+                } else {
+                    // Otherwise, fill sidebar with this location’s items
+                    sidebarList.innerHTML = "";
+                    items.forEach(function(item) {
+                        var li = document.createElement("li");
+                        li.innerHTML = `
+                            <strong>${item.title}</strong><br>
+                            <small>${item.category} • RM ${item.price}</small><br>
+                            <button onclick="window.location.href='/item/${item.id}'">View Details</button>
+                        `;
+                        sidebarList.appendChild(li);
+                    });
+
+                    // Reset previously active marker
+                    if (activeMarker) {
+                        activeMarker.setIcon(defaultIcon);
+                    }
+                    activeMarker = markerRef;
+                    markerRef.setIcon(highlightIcon);
+                }
+            });
+
+            // Simple popup hint
+            var popupContent = "<div class='popup-card'><h4>📍 " + locationName + "</h4><p>HB4.</p></div>";
+            markerRef.bindPopup(popupContent);
+
+            allMarkers[locationName] = markerRef;
+        })(loc, locationGroups[loc], marker);
+    }
+}
 </script>
 {% endblock %}

@@ -59,8 +59,13 @@
                 <div class="item-card">
                     <!-- Item image placeholder (no image_filename field in database) -->
                     <div class="item-image">
-                        <div class="image-placeholder">📦</div>
-                    </div>
+    {% if item.image_filename %}
+        <img src="{{ url_for('static', filename='uploads/' ~ item.image_filename) }}" 
+             alt="{{ item.title }}" class="item-thumbnail">
+    {% else %}
+        <div class="image-placeholder">📦</div>
+    {% endif %}
+</div>
                     
                     <!-- Item information display -->
                     <div class="item-info">

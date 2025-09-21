@@ -35,7 +35,8 @@ def posts():
             category = category,
             item_condition = condition,
             location = location,
-            seller_id = current_user.user_id 
+            seller_id = current_user.user_id,
+            image_filename=filename
         )
         db.session.add(new_item)
         db.session.commit()

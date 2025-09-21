@@ -27,6 +27,7 @@ class Item(db.Model): #code used for testing
     item_condition = db.Column(db.Enum('new', 'used', 'refurbished'), nullable=False)
     location = db.Column(db.String(150))
     seller_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    image_filename = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
     seller = db.relationship('User', backref='items')
