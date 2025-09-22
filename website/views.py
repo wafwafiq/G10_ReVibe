@@ -44,23 +44,38 @@ def posts():
         return redirect(url_for('views.catalog'))
 
 
-    return render_template('post_creation.html') 
+    return render_template('post_creation.html')
+ 
 
-@views.route('/catalog', methods=['GET','POST'])
+@views.route('/catalog', methods=['GET'])
 @login_required
-def catalog():
-    if request.method == 'POST':
-        search_term = request.form['search']
-        items = Item.query.filter(Item.title.contains(search_term)).all()
-    else:
-        items = Item.query.all()
+def catalog(): #added code to filter and search for posts
 
-    return render_template('catalog.html', items=items) 
 
-@views.route('/map')
-@login_required
-def map():
-    return  render_template('catalog.html')#redirect to catalog/map page
+
+    search_query = request.args.get("search", "").lower()
+    category_filter = request.args.get("category_filter", "")
+
+    query = Item.query
+
+    if search_query:
+        query = query.filter(Item.title.ilike(f"%{search_query}%"))
+
+    if category_filter:
+        query = query.filter_by(category=category_filter)
+
+    filtered_items = query.all()
+
+    categories = ["books", "electronics", "furniture", "clothing", "sports", "kitchen"]
+
+    
+    return render_template(
+        "catalog.html",
+        items=filtered_items,
+        categories=categories,
+        search_query=search_query,
+        selected_category=category_filter
+    ) 
 
 @views.route('/chat',methods=['GET','POST'])
 @login_required
@@ -107,3 +122,9 @@ def settings():
         return redirect('/settings')
 
     return render_template("settings.html", user=current_user)
+
+@views.route('/edit posts', methods=['GET','POST']) #edit post functionality
+@login_required
+def edit_posts():
+    
+    return render_template("edit_item.html")
