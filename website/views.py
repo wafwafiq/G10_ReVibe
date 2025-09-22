@@ -46,20 +46,20 @@ def posts():
 
     return render_template('post_creation.html')
  
-@views.route('/edit/<int:item_id>', methods=['GET','POST']) #edit post functionality
+@views.route('/edit/<int:item_id>', methods=['GET','POST'])
 @login_required
 def edit_item(item_id):
-    item = Item.query.get_or_404(item_id) #retrieves data from existing posts
+    item = Item.query.get_or_404(item_id)
 
     if request.method == "POST":
-        item.image = request.files['item_images'] #post to be rewritten 
+        item.image = request.files['item_images'] 
         item.title = request.form['item_title']
         item.description = request.form['item_description']
         item.price = request.form['item_price']
         item.category = request.form['item_category']
         item.condition = request.form['item_condition']
         item.location = request.form['item_location']
-        db.session.commit() #save new data and replace old data
+        db.session.commit()
         return redirect(url_for('views.home'))
     
     return render_template("edit_item.html", item=item)
@@ -95,17 +95,40 @@ def catalog():
     ) 
 
 
-@views.route('/start_chat')
-@views.route('/chatbox',methods=['GET','POST'])
+@views.route('/start_chat/<int:seller_id>') #code to start chat with seller
+@login_required
+def start_chat(seller_id):
+    
+    return redirect(url_for('chat', chat_id=chat.id))
+
+@views.route('/chatlog',methods=['GET','POST'])
 @login_required
 def chats():
-    
+
+    chats = Chat.query.filter(
+        (Chat.user1_id == current_user.id) | (Chat.user2_id == current_user.id)
+        ).all()
+    chat_data = []
+    for chat in chats:
+
+        if chat.user1_id == current_user.id:
+            partner = User.query.get(chat.user2_id)
+
+        else:
+            partner = User.query.get(chat.user1_id)
     return render_template('chatlog.html') 
 
 views.route("/chat/<int:chat_id>")
-def chatroom():
+@login_required
+def chatroom(chat_id):
+    chat = Chat.query.get_or_404(chat_id)
 
-    return render_template('chatroom.html')
+    if current_user.id not in [chat.user_id, chat.user_id]:
+        return "You are not allowed to access this chat", 403
+    
+    messages = Message.query.filter_by(chat_id=chat.id).order_by(Message.timestamp).all()
+
+    return render_template('chatroom.html', chat=chat, messages=messages)
 
 @views.route('/')
 def index():
