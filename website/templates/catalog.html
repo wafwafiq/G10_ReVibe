@@ -7,9 +7,11 @@
     <h1 class="page-title">Browse Catalog</h1>
 
     <!-- Search and filter section -->
-    <div class="search-filter-section">
+
+
+    <form method="get" action="{{ url_for('views.catalog') }}" class="search-filter-section">
         <div class="search-container">
-            <input type="text" class="search-input" placeholder="🔍 Search items...">
+            <input type="text" name="search" class="search-input" placeholder="🔍 Search items...">
             <button class="search-btn">Search</button>
         </div>
         
@@ -25,8 +27,7 @@
                 <option value="kitchen">🍳 Kitchen</option>
             </select>
         </div>
-    </div>
-
+    </form>
 
     <!-- Items display section -->
     <div class="items-section">
