@@ -92,8 +92,8 @@
                             View Details
                         </a>
                         
-                        <!-- Edit button - placeholder until backend route is ready -->
-                        <a href="#" class="view-details-btn" style="margin-top:0.5rem; background:#6B7280;" title="Edit functionality coming soon">
+                        <!-- Edit button -->
+                        <a href="{{ url_for('views.edit_item', item_id=item.item_id) }}" class="view-details-btn" style="margin-top:0.5rem; background:#6B7280;">
                             Edit
                         </a>
                     </div>
