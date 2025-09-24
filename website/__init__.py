@@ -17,12 +17,13 @@ def create_app():
     app.config['UPLOAD_FOLDER'] = os.path.join('website', 'static', 'uploads')
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True) 
     app.secret_key = "your_secret_key"
-    app.config['MAIL_SERVER'] = 'smtp.office365.com'
+
+    app.config['MAIL_USERNAME'] = 'revibe.app.mail@gmail.com'
+    app.config['MAIL_PASSWORD'] = 'clytqfinttxmqgad'
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
     app.config['MAIL_PORT'] = 587
     app.config['MAIL_USE_TLS'] = True
-    app.config['MAIL_USERNAME'] = 'ReVibe_app@outlook.com'
-    app.config['MAIL_PASSWORD'] = 'Lx4ptiLSn0niSGO0'
-    app.config['MAIL_DEFAULT_SENDER'] = ('ReVibe_app@outlook.com')
+    app.config['MAIL_DEFAULT_SENDER'] = ('ReVibe App', 'revibe.app.mail@gmail.com')
 
     db.init_app(app)
     mail.init_app(app)
