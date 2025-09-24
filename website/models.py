@@ -38,7 +38,7 @@ class Item(db.Model):
     def get_id(self):
         return str(self.item_id)
     
-class Conversation(db.Model):
+class Conversation(db.Model): #db for chat
     __tablename__ = 'conversations'
     
     conversation_id = db.Column(db.Integer, primary_key=True)
@@ -55,7 +55,7 @@ class Conversation(db.Model):
     user1 = db.relationship('User', foreign_keys=[user1_id])
     user2 = db.relationship('User', foreign_keys=[user2_id])
 
-class Message(db.Model):
+class Message(db.Model): #db for messages
     __tablename__ = 'messages'
     
     message_id = db.Column(db.Integer, primary_key=True)
