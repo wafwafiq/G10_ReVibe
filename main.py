@@ -1,5 +1,5 @@
 from website import create_app
-from website import db
+from website import db, socketio
 from website.models  import User
 
 app = create_app()
@@ -20,4 +20,4 @@ if __name__ == "__main__":
             db.session.add(test_user)
             db.session.commit()
 
-    app.run(debug=True)
+    socketio.run(app, debug=True) #changed to socketio.run to enable Flask-SocketIO

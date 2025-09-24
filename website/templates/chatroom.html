@@ -120,7 +120,7 @@ BACKEND REQUIREMENTS FOR WAFIQ:
     
     <!-- Message Display Area - Shows chat history -->
     <div class="messages-container">
-        <div class="messages-area">
+        <div class="messages-area" id="messages">
             {% if messages %}
                 {% for message in messages %}
                 <!-- Individual message bubble -->
@@ -152,10 +152,11 @@ BACKEND REQUIREMENTS FOR WAFIQ:
     
     <!-- Message Input Form - Send new messages -->
     <div class="message-input-container">
-        <form class="message-form" method="POST" action="{{ url_for('views.send_message', conversation_id=conversation.conversation_id) if conversation else '#' }}">
+        <form class="message-form" id="chat-form">
             <!-- Message input area -->
             <div class="input-group">
-                <textarea 
+                <textarea
+                    id="messages-input" 
                     class="message-input" 
                     name="message_content"
                     placeholder="Type your message..."
@@ -179,4 +180,42 @@ BACKEND REQUIREMENTS FOR WAFIQ:
     </div>
 
 </div>
+<!-- Javascript real-time messaging -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+    const socket = io();
+    document.getElementById("chat-form").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const input = document.getElementById("messages-input");
+        const message = input.value.trim();
+
+        if (message) {
+
+            socket.emit("send_message", {
+                conversation_id: {{ conversation.conversation_id }},
+                content: message
+            });
+
+            input.value = "";
+        }
+    });
+
+
+    socket.on("receive_message", function(data) {
+        const messagesDiv = document.getElementById("messages");
+        const msgElement = document.createElement("div");
+        msgElement.classList.add("message-bubble");
+        msgElement.innerHTML = `
+    <div class="message-content">
+        <p class="message-text">${data.content}</p>
+    </div>
+    <div class="message-meta">
+        <span class="message-time">just now</span>
+    </div>
+    `;
+        messagesDiv.appendChild(msgElement);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
+</script>
 {% endblock %}

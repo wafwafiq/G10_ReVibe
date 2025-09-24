@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template , request, redirect, url_for, current_app, flash
 from flask_login import login_required, current_user
 from .models import User, Item, Conversation, Message
-from . import db
+from flask_socketio import join_room, leave_room, send
+from . import db, socketio
 import os 
 import uuid
 
@@ -93,20 +94,20 @@ def catalog():
         search_query=search_query,
         selected_category=category_filter
     ) 
-
+#start chat between seller and buyer
 @views.route('/start_chat/<int:item_id>/<int:seller_id>')
 @login_required
 def start_chat(item_id, seller_id):
-    seller = User.query.get_or_404(seller_id)
+    seller = User.query.get_or_404(seller_id) #looks for seller and item
     item = Item.query.get_or_404(item_id)
 
-    conversation = Conversation.query.filter(
+    conversation = Conversation.query.filter( #checks whether seller and buyer have an existing conversation
     ((Conversation.user1_id == current_user.user_id) & (Conversation.user2_id == seller.user_id)) |
     ((Conversation.user1_id == seller.user_id) & (Conversation.user2_id == current_user.user_id))
     ).filter_by(item_id=item.item_id).first()
 
 
-    if not conversation:
+    if not conversation: #create conversation if it doesnt exist
         conversation = Conversation(
         item_id=item.item_id,
         user1_id=current_user.user_id,
@@ -114,25 +115,26 @@ def start_chat(item_id, seller_id):
     )
     db.session.add(conversation)
     db.session.commit()
+    #redirects to chatroom with seller
+    return redirect(url_for('views.chatroom', conversation_id=conversation.conversation_id))
 
-    return redirect(url_for('views.chatroom', chat_id=conversation.conversation_id))
-
-@views.route('/chatlog',methods=['GET','POST'])
+@views.route('/chatlog',methods=['GET','POST']) #shows all chats of current buyer with sellers
 @login_required
 def chats():
 
     chats = Conversation.query.filter(
-        (Conversation.user1_id == current_user.user_id) | (Conversation.user2_id == current_user.user_id)).all()
+        (Conversation.user1_id == current_user.user_id) | 
+        (Conversation.user2_id == current_user.user_id)).all() #searches and shows all existing chats
     
     return render_template('chatlog.html', chats=chats) 
 
-@views.route("/chat/<int:chat_id>")
+@views.route("/chat/<int:conversation_id>") #chatroom between seller and buyer
 @login_required
-def chatroom(chat_id):
-    conversation = Conversation.query.get_or_404(chat_id)
-    messages = Message.query.filter_by(conversation_id=conversation.conversation_id).order_by(Message.created_at).all()
-
-    return render_template('chatroom.html', conversation=conversation, messages=messages)
+def chatroom(conversation_id):
+    conversation = Conversation.query.get_or_404(conversation_id) #shows which conversation you are in
+    messages = Message.query.filter_by(conversation_id=conversation.conversation_id).order_by(Message.created_at).all() #shows all messages in the conversation
+    item = Item.query.get_or_404(conversation.item_id)
+    return render_template('chatroom.html', conversation=conversation, messages=messages, item=item)
 
 @views.route('/')
 def index():
@@ -174,3 +176,22 @@ def settings():
         return redirect('/settings')
 
     return render_template("settings.html", user=current_user)
+
+@socketio.on('join') #decorator to tell the server a buyer has entered a conversation
+def handle_join(data):
+    room = data['conversation_id']
+    join_room(room)
+
+@socketio.on('send_message') #decorator to send messages to user
+def handle_message(data):
+    room = data['conversation_id']
+    msg_content = data['content']
+
+    message = Message(conversation_id=room,
+                    sender_id=current_user.user_id,
+                    content=msg_content
+    )
+    db.session.add(message)
+    db.session.commit()
+
+    send({'user': current_user.name, 'content': msg_content}, to=room)
