@@ -26,7 +26,7 @@ def create_app():
 
     db.init_app(app)
     mail.init_app(app)
-    socketio.init_app(app)
+    socketio.init_app(app, cors_allowed_origins="*")
 
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)

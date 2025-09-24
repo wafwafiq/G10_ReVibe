@@ -122,11 +122,24 @@ def start_chat(item_id, seller_id):
 @login_required
 def chats():
 
-    chats = Conversation.query.filter(
+    conversations = Conversation.query.filter(
         (Conversation.user1_id == current_user.user_id) | 
-        (Conversation.user2_id == current_user.user_id)).all() #searches and shows all existing chats
+        (Conversation.user2_id == current_user.user_id)#searches and shows all existing chats
+    ).options(
+        db.joinedload(Conversation.item),
+        db.joinedload(Conversation.user1),
+        db.joinedload(Conversation.user2),
+        db.joinedload(Conversation.messages)
+    ).all()
+
+    processed_conversations =[]
+    for conversation in conversations:
+        conversation.other_user = conversation.get_other_user(current_user.user_id)
+        conversation.last_message = conversation.get_last_message()
+        conversation.unread_count = conversation.get_unread_count(current_user.user_id)
+        processed_conversations.append(conversation)
     
-    return render_template('chatlog.html', chats=chats) 
+    return render_template('chatlog.html', conversations=processed_conversations) 
 
 @views.route("/chat/<int:conversation_id>") #chatroom between seller and buyer
 @login_required
@@ -177,21 +190,45 @@ def settings():
 
     return render_template("settings.html", user=current_user)
 
-@socketio.on('join') #decorator to tell the server a buyer has entered a conversation
+@socketio.on('join')
 def handle_join(data):
-    room = data['conversation_id']
-    join_room(room)
+    try:
+        room = str(data['conversation_id'])
+        join_room(room)
+        print(f"User {current_user.user_id} joined room {room}")
+    except Exception as e:
+        print(f"Error in handle_join: {e}")
 
-@socketio.on('send_message') #decorator to send messages to user
+@socketio.on('send_message')
 def handle_message(data):
-    room = data['conversation_id']
-    msg_content = data['content']
+    try:
+        room = str(data['conversation_id'])
+        msg_content = data['content']
+        
+        if not msg_content or len(msg_content.strip()) == 0:
+            return
+        
+        if len(msg_content) > 500:
+            msg_content = msg_content[500]
 
-    message = Message(conversation_id=room,
-                    sender_id=current_user.user_id,
-                    content=msg_content
-    )
-    db.session.add(message)
-    db.session.commit()
+        message = Message(
+            conversation_id=data['conversation_id'],
+            sender_id=current_user.user_id,
+            content=msg_content.strip()
+        )
+        db.session.add(message)
+        db.session.commit()
+        socketio.emit("receive_message", {
+        "sender_id": current_user.user_id,
+        "content": msg_content.strip(),
+        "created_at": message.created_at.isoformat(),
+        "sender_name": current_user.name
+        } ,room=room)
 
-    send({'user': current_user.name, 'content': msg_content}, to=room)
+        socketio.emit('message_sent',{
+            'message_id': message.message_id,
+            'created_at': message.created_at.isoformat()
+        }, room=room)
+    except Exception as e:
+        print(f"Error in handle_message: {e}")
+        socketio.emit('error', {'message': 'Failed to send message'}, room=request.sid)
