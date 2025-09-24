@@ -47,15 +47,31 @@ class Conversation(db.Model): #db for chat
     user2_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    messages = db.relationship('Message', backref='conversation', lazy=True, cascade="all, delete-orphan")
+
+    messages = db.relationship('Message', backref='conversation', lazy=True, cascade="all, delete-orphan", order_by="Message.created_at")
+    item = db.relationship('Item', backref='conversations')
+    user1 = db.relationship('User', foreign_keys=[user1_id])
+    user2 = db.relationship('User', foreign_keys=[user2_id])
 
     def participants(self):
         return [self.user1, self.user2]
     
-    user1 = db.relationship('User', foreign_keys=[user1_id])
-    user2 = db.relationship('User', foreign_keys=[user2_id])
-
-class Message(db.Model): #db for messages
+    def get_other_user(self, current_user_id):
+        if self.user1_id == current_user_id:
+            return self.user2
+        return self.user1
+    
+    def get_last_message(self):
+        if self.messages:
+            return self.messages[-1]
+        return None
+    def get_unread_count(self, current_user_id):
+        return Message.query.filter_by(
+            conversation_id=self.conversation_id,
+            is_read=False
+        ).filter(Message.sender_id != current_user_id).count()
+    
+class Message(db.Model):
     __tablename__ = 'messages'
     
     message_id = db.Column(db.Integer, primary_key=True)

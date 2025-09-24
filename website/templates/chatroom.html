@@ -13,15 +13,6 @@ BACKEND REQUIREMENTS FOR WAFIQ:
    - Conversation.item relationship to Item model
    - Conversation.user1 relationship to User model  
    - Conversation.user2 relationship to User model
-   
-3. SEND_MESSAGE ROUTE needed:
-   @views.route('/send_message/<int:conversation_id>', methods=['POST'])
-   @login_required
-   def send_message(conversation_id):
-       # Get form data: request.form['message_content']
-       # Create new Message object
-       # Save to database
-       # Redirect back to chatroom
        
 4. Template expects:
    - conversation.user1_id, conversation.user2_id
@@ -70,7 +61,7 @@ BACKEND REQUIREMENTS FOR WAFIQ:
         <div class="context-item">
             <!-- Item image -->
             <div class="context-item-image">
-                {% if conversation and conversation.item and conversation.item.image_filename %}
+                {% if conversation and conversation.item and conversation.item.image_filename %}    
                     <img src="{{ url_for('static', filename='uploads/' ~ conversation.item.image_filename) }}" 
                          alt="{{ conversation.item.title }}" 
                          class="item-thumbnail">
@@ -156,7 +147,7 @@ BACKEND REQUIREMENTS FOR WAFIQ:
             <!-- Message input area -->
             <div class="input-group">
                 <textarea
-                    id="messages-input" 
+                    id="message-input" 
                     class="message-input" 
                     name="message_content"
                     placeholder="Type your message..."
@@ -174,7 +165,7 @@ BACKEND REQUIREMENTS FOR WAFIQ:
             <!-- Character counter and form info -->
             <div class="input-meta">
                 <small class="char-info">Max 500 characters</small>
-                <small class="form-hint">send</small>
+                <small class="form-hint">Press enter to send</small>
             </div>
         </form>
     </div>
@@ -184,38 +175,107 @@ BACKEND REQUIREMENTS FOR WAFIQ:
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
     const socket = io();
+
+    {% if conversation %}
+        const conversationId = {{ conversation.conversation_id }};
+    {% else %}
+        const conversationId = null;
+    {% endif %}
+
+    {% if current_user.is_authenticated %}
+       const currentUserId = {{ current_user.user_id }};
+    {% else %}
+       const currentUserId = null;
+    {% endif %}
+
+
+    if (conversationId) {
+        socket.emit('join', {
+            conversation_id: conversationId
+        });
+    }
+
     document.getElementById("chat-form").addEventListener("submit", function(e) {
         e.preventDefault();
 
-        const input = document.getElementById("messages-input");
+        const input = document.getElementById("message-input");
         const message = input.value.trim();
 
-        if (message) {
+        if (message && conversationId) {
 
             socket.emit("send_message", {
-                conversation_id: {{ conversation.conversation_id }},
+                conversation_id: conversationId,
                 content: message
             });
 
+            addMessageToUI(message, true, 'Sending...');
             input.value = "";
         }
     });
 
 
-    socket.on("receive_message", function(data) {
+    socket.on("message", function(data) {
+        if (data.sender_id !== currentUserId) {
+            addMessageToUI(data.content, false, formatTime(new Date()));
+        }
+    });
+    socket.on("message_sent", function(data) {
+
+        const messages = document.querySelectorAll('.message-bubble.sent');
+        const lastMessage = messages[messages.length - 1];
+        if (lastMessage) {
+            const timeSpan = lastMessage.querySelector('.message-time');
+            if (timeSpan && timeSpan.textContent === 'Sending...') {
+                timeSpan.textContent = formatTime(new Date());
+            }
+        }
+    });
+
+    socket.on("connect_error", function(error) {
+        console.error("Connection failed:", error);
+        showError("Connection failed. Messages may not be delivered in real-time");
+    });
+
+    function addMessageToUI(content, isSent, timeText) {
         const messagesDiv = document.getElementById("messages");
         const msgElement = document.createElement("div");
         msgElement.classList.add("message-bubble");
+        msgElement.classList.add(isSent ? "sent" : "received");
         msgElement.innerHTML = `
     <div class="message-content">
-        <p class="message-text">${data.content}</p>
+        <p class="message-text">${escapeHtml(content)}</p>
     </div>
-    <div class="message-meta">
-        <span class="message-time">just now</span>
-    </div>
-    `;
-        messagesDiv.appendChild(msgElement);
+        <div class="message-meta">
+            <span class="message-time">${timeText}</span>
+            ${isSent ? '<span class="message-status"></span>' : ''}
+            </div>
+        `;
+        messagesDiv.appendChild(msgElement)
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function formatTime(date) {
+        return date.toLocaleTimeString('en-US' , {
+            hour : 'numeric',
+            minute : '2-digit',
+            hour12: true
+        })
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function showError(message) {
+        console.error(message)
+    }
+    document.getElementById("message-input").addEventListener("keydown", function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            document.getElementById("chat-form").dispatchEvent(new Event('submit'));
+        }
     });
 </script>
 {% endblock %}
