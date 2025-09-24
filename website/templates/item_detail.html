@@ -97,7 +97,7 @@
 
             <!-- Contact Actions -->
             <div class="contact-actions">
-                <a href="{{ url_for('views.chats') }}" class="btn-contact-seller">
+                <a href="{{ url_for('views.start_chat', item_id=item.item_id, seller_id=item.seller.user_id) }}" class="btn-contact-seller">
                     💬 Contact Seller
                 </a>
                 <p class="contact-note">

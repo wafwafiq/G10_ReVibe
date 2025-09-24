@@ -37,3 +37,33 @@ class Item(db.Model):
     
     def get_id(self):
         return str(self.id)
+    
+class Conversation(db.Model): #db for chat
+    __tablename__ = 'conversations'
+    
+    conversation_id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('items.item_id'), nullable=False)
+    user1_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    user2_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    messages = db.relationship('Message', backref='conversation', lazy=True, cascade="all, delete-orphan")
+
+    def participants(self):
+        return [self.user1, self.user2]
+    
+    user1 = db.relationship('User', foreign_keys=[user1_id])
+    user2 = db.relationship('User', foreign_keys=[user2_id])
+
+class Message(db.Model): #db for messages
+    __tablename__ = 'messages'
+    
+    message_id = db.Column(db.Integer, primary_key=True)
+    conversation_id = db.Column(db.Integer, db.ForeignKey('conversations.conversation_id'), nullable=False)
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)
+
+    
+    sender = db.relationship('User', foreign_keys=[sender_id])

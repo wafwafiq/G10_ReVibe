@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template , request, redirect, url_for, current_app, flash
 from flask_login import login_required, current_user
-from .models import User, Item
+from .models import User, Item, Conversation, Message
 from . import db
 import os 
 import uuid
@@ -94,37 +94,45 @@ def catalog():
         selected_category=category_filter
     ) 
 
-@views.route('/start_chat/<int:seller_id>')
+@views.route('/start_chat/<int:item_id>/<int:seller_id>')
 @login_required
-def start_chat(seller_id):
+def start_chat(item_id, seller_id):
     seller = User.query.get_or_404(seller_id)
+    item = Item.query.get_or_404(item_id)
+
+    conversation = Conversation.query.filter(
+    ((Conversation.user1_id == current_user.user_id) & (Conversation.user2_id == seller.user_id)) |
+    ((Conversation.user1_id == seller.user_id) & (Conversation.user2_id == current_user.user_id))
+    ).filter_by(item_id=item.item_id).first()
 
 
-    chat = (Chat.query
-            .filter(Chat.participants.any(id=current_user.id))
-            .filter(Chat.participants.any(id=seller.id)).first())
+    if not conversation:
+        conversation = Conversation(
+        item_id=item.item_id,
+        user1_id=current_user.user_id,
+        user2_id=seller.user_id
+    )
+    db.session.add(conversation)
+    db.session.commit()
 
-
-    if not chat:
-        chat = Chat()
-        chat.participants.append(current_user)
-        chat.participants.append(seller)
-        db.session.add(chat)
-        db.session.commit()
-
-    return redirect(url_for('views.chatroom', chat_id=chat.id))
+    return redirect(url_for('views.chatroom', chat_id=conversation.conversation_id))
 
 @views.route('/chatlog',methods=['GET','POST'])
 @login_required
 def chats():
-    chats = Chat.query.filter(Chat.participants.any(id=current_user.id)).all()
+
+    chats = Conversation.query.filter(
+        (Conversation.user1_id == current_user.user_id) | (Conversation.user2_id == current_user.user_id)).all()
+    
     return render_template('chatlog.html', chats=chats) 
 
-views.route("/chat/<int:chat_id>")
+@views.route("/chat/<int:chat_id>")
 @login_required
 def chatroom(chat_id):
+    conversation = Conversation.query.get_or_404(chat_id)
+    messages = Message.query.filter_by(conversation_id=conversation.conversation_id).order_by(Message.created_at).all()
 
-    return render_template('chatroom.html', chat=chat, messages=messages)
+    return render_template('chatroom.html', conversation=conversation, messages=messages)
 
 @views.route('/')
 def index():
