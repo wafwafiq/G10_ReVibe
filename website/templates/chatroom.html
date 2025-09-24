@@ -2,6 +2,34 @@
 
 {% block title %}Chat - ReVibe{% endblock %}
 
+<!--
+BACKEND REQUIREMENTS FOR WAFIQ:
+
+1. CHATROOM ROUTE (/chat/<int:chat_id>) needs to pass these variables:
+   - conversation: Conversation object with relationships loaded
+   - messages: List of Message objects for this conversation
+   
+2. Required relationships in models.py:
+   - Conversation.item relationship to Item model
+   - Conversation.user1 relationship to User model  
+   - Conversation.user2 relationship to User model
+   
+3. SEND_MESSAGE ROUTE needed:
+   @views.route('/send_message/<int:conversation_id>', methods=['POST'])
+   @login_required
+   def send_message(conversation_id):
+       # Get form data: request.form['message_content']
+       # Create new Message object
+       # Save to database
+       # Redirect back to chatroom
+       
+4. Template expects:
+   - conversation.user1_id, conversation.user2_id
+   - conversation.item.title, conversation.item.price, conversation.item.image_filename
+   - conversation.item.item_id, conversation.item.seller_id
+   - messages list with sender_id, content, created_at
+-->
+
 {% block content %}
 <div class="chatroom-page">
     <!--Shows who you're chatting with and navigation -->
@@ -20,7 +48,17 @@
                 <span class="avatar-placeholder">👤</span>
             </div>
             <div class="participant-info">
-                <h2 class="participant-name">{{ other_user.name if other_user else 'Chat User' }}</h2>
+                <h2 class="participant-name">
+                    {% if conversation %}
+                        {% if conversation.user1_id == current_user.user_id %}
+                            {{ conversation.user2.name }}
+                        {% else %}
+                            {{ conversation.user1.name }}
+                        {% endif %}
+                    {% else %}
+                        Chat User
+                    {% endif %}
+                </h2>
                 <p class="participant-status">Online • Last seen recently</p>
             </div>
         </div>
@@ -32,22 +70,30 @@
         <div class="context-item">
             <!-- Item image -->
             <div class="context-item-image">
-                <img src="{{ item.image_url if item.image_url else '/static/images/placeholder-item.jpg' }}" 
-                     alt="{{ item.title }}" 
-                     class="item-thumbnail">
+                {% if conversation and conversation.item and conversation.item.image_filename %}
+                    <img src="{{ url_for('static', filename='uploads/' ~ conversation.item.image_filename) }}" 
+                         alt="{{ conversation.item.title }}" 
+                         class="item-thumbnail">
+                {% else %}
+                    <div class="image-placeholder">📦</div>
+                {% endif %}
             </div>
             
             <!-- Item details -->
             <div class="context-item-details">
-                <h3 class="context-item-title">{{ item.title if item else 'Item Discussion' }}</h3>
+                <h3 class="context-item-title">
+                    {{ conversation.item.title if conversation and conversation.item else 'Item Discussion' }}
+                </h3>
                 <div class="context-item-meta">
-                    <span class="context-price">RM {{ item.price if item else '0.00' }}</span>
+                    <span class="context-price">
+                        RM {{ conversation.item.price if conversation and conversation.item else '0.00' }}
+                    </span>
                 </div>
             </div>
             
             <!-- Quick actions to view full details-->
             <div class="context-actions">
-                <a href="{{ url_for('views.item_detail', item_id=item.item_id) if item else '#' }}" 
+                <a href="{{ url_for('views.item_detail', item_id=conversation.item.item_id) if conversation and conversation.item else '#' }}" 
                    class="view-item-btn">
                     View Full Details
                 </a>
@@ -62,7 +108,7 @@
             </div>
             
             <!-- Mark as sold button (for seller only) -->
-            {% if current_user.is_authenticated and item and current_user.user_id == item.seller_id %}
+            {% if current_user.is_authenticated and conversation and conversation.item and current_user.user_id == conversation.item.seller_id %}
             <div class="seller-actions">
                 <button class="mark-sold-btn">
                     ✅ Mark as Sold
@@ -106,7 +152,7 @@
     
     <!-- Message Input Form - Send new messages -->
     <div class="message-input-container">
-        <form class="message-form" method="POST" action="{{ url_for('views.send_message', item_id=item.item_id) if item else '#' }}">
+        <form class="message-form" method="POST" action="{{ url_for('views.send_message', conversation_id=conversation.conversation_id) if conversation else '#' }}">
             <!-- Message input area -->
             <div class="input-group">
                 <textarea 
