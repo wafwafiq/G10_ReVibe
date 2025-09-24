@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - ReVibe</title>
+
+    </head>
+<body>
+    <!-- Admin Header -->
+    <div class="admin-header">
+        <h1 class="admin-title">ReVibe </h1>
+        <p class="admin-subtitle">Manage users and posts</p>
+    </div>
+    
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Dashboard Cards Grid -->
+        <div class="dashboard-grid">
+            <!-- Users Management Card -->
+            <div class="dashboard-container">
+                <div class="card-icon">👥</div>
+                <h2 class="card-title">Users</h2>
+                <p class="card-description">View and manage all registered users</p>
+                <a href="/admin/users" class="card-button">Manage Users</a>
+            </div>
+            
+            <!-- Posts Management Card -->
+            <div class="dashboard-con">
+                <div class="card-icon">📝</div>
+                <h2 class="card-title">Posts</h2>
+                <p class="card-description">View and manage all posted items</p>
+                <a href="/admin/posts" class="card-button">Manage Posts</a>
+            </div>
+        </div>
+        
+        <!-- Logout Section -->
+        <div class="logout-section">
+            <a href="/logout" class="logout-link"> [LOGOUT] </a>
+        </div>
+    </div>
+</body>
+</html>
+
+    <style>
+        /* admin dashboard styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f1eded;
+        }
+        
+        .admin-header {
+            background-color: #05284b;
+            color: white;
+            padding: 20px;
+            margin: -20px -20px 30px -20px;
+            text-align: center;
+        }
+        
+        .admin-title {
+            margin: 0;
+            font-size: 28px;
+        }
+        
+        .admin-subtitle {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .dashboard-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 24px;
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+        
+        .card-description {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .card-button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.2s;
+        }
+        
+        .card-button:hover {
+            background-color: #2980b9;
+        }
+        
+        .logout-section {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .logout-link {
+            color: #ea2907;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .logout-link:hover {
+            text-decoration: underline;
+        }
+    </style>
