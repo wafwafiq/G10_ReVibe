@@ -3,47 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - ReVibe</title>
-
-    </head>
-<body>
-    <!-- Admin Header -->
-    <div class="admin-header">
-        <h1 class="admin-title">ReVibe </h1>
-        <p class="admin-subtitle">Manage users and posts</p>
-    </div>
-    
-    <!-- Dashboard Container -->
-    <div class="dashboard-container">
-        <!-- Dashboard Cards Grid -->
-        <div class="dashboard-grid">
-            <!-- Users Management Card -->
-            <div class="dashboard-container">
-                <div class="card-icon">👥</div>
-                <h2 class="card-title">Users</h2>
-                <p class="card-description">View and manage all registered users</p>
-                <a href="/admin/users" class="card-button">Manage Users</a>
-            </div>
-            
-            <!-- Posts Management Card -->
-            <div class="dashboard-con">
-                <div class="card-icon">📝</div>
-                <h2 class="card-title">Posts</h2>
-                <p class="card-description">View and manage all posted items</p>
-                <a href="/admin/posts" class="card-button">Manage Posts</a>
-            </div>
-        </div>
-        
-        <!-- Logout Section -->
-        <div class="logout-section">
-            <a href="/logout" class="logout-link"> [LOGOUT] </a>
-        </div>
-    </div>
-</body>
-</html>
-
+    <title>Admin Dashboard - ReVibe</title>
     <style>
-        /* admin dashboard styles */
+        /* Admin dashboard styles */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -129,20 +91,56 @@
             background-color: #2980b9;
         }
         
-        .logout-section {
+        .back-section {
             text-align: center;
             margin-top: 40px;
             padding-top: 30px;
             border-top: 1px solid #ddd;
         }
         
-        .logout-link {
-            color: #ea2907;
+        .back-link {
+            color: #3498db;
             text-decoration: none;
             font-size: 14px;
         }
         
-        .logout-link:hover {
+        .back-link:hover {
             text-decoration: underline;
         }
     </style>
+</head>
+<body>
+    <!-- Admin Header -->
+    <div class="admin-header">
+        <h1 class="admin-title">ReVibe Admin</h1>
+        <p class="admin-subtitle">Data Management System</p>
+    </div>
+    
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Dashboard Cards Grid -->
+        <div class="dashboard-grid">
+            <!-- Users Management Card -->
+            <div class="dashboard-card">
+                <div class="card-icon">👥</div>
+                <h2 class="card-title">Users</h2>
+                <p class="card-description">View and manage all registered users</p>
+                <a href="/admin/users" class="card-button">Manage Users</a>
+            </div>
+            
+            <!-- Posts Management Card -->
+            <div class="dashboard-card">
+                <div class="card-icon">📝</div>
+                <h2 class="card-title">Posts</h2>
+                <p class="card-description">View and manage all posted items</p>
+                <a href="/admin/posts" class="card-button">Manage Posts</a>
+            </div>
+        </div>
+        
+        <!-- Back to Main Site Section -->
+        <div class="back-section">
+            <a href="/" class="back-link">← Back to Main Website</a>
+        </div>
+    </div>
+</body>
+</html>

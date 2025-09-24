@@ -54,7 +54,7 @@
                         </div>
                         <p class="item-price">RM {{ item.price }}</p>
                         <p class="item-location">📍 {{ item.location }}</p>
-                        <p class="item-condition">Condition: {{ item.item_condition }}</p>
+                        <span class="condition-badge {{ item.item_condition }}">{{ item.item_condition.title() }}</span>
                         <p class="item-time">Posted {{ item.created_at.strftime('%B %d, %Y') }}</p>
                     </div>
                     <div class="item-actions">
