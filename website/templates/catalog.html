@@ -105,10 +105,10 @@ var campusLocations = {
     "fci": [2.928615, 101.641042],
     "dewan_tun_caunselor": [2.928955, 101.641975],
     "fom": [2.929614, 101.641152],
-    "hostel_HB1": [2.924835, 101.645800],
-    "hostel_HB2": [2.925116, 101.644993],
-    "hostel_HB3": [2.925133, 101.643928],
-    "hostel_HB4": [2.925789, 101.644312],
+    "hostel_HB1": [2.924950, 101.645422],
+    "hostel_HB2": [2.925018, 101.644741],
+    "hostel_HB3": [2.925017, 101.643907],
+    "hostel_HB4": [2.925738, 101.643888],
     "learning_point": [2.927648, 101.641938],
     "foe": [2.926475, 101.641391]
 };
@@ -179,10 +179,9 @@ function renderSidebar(items) {
         return matchesCategory && matchesSearch;
     });
 
-    if (filteredItems.length === 0) {
-        sidebarList.innerHTML = "<li><em>No matching items</em></li>";
-        return;
-    }
+   if (filteredItems.length === 0) {
+    return; // hide sidebar list completely if no matches
+}
 
     // Build cards
     filteredItems.forEach(function(item) {

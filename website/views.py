@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template , request, redirect, url_for, current_app, flash
 from flask_login import login_required, current_user
-from .models import User, Item
+from .models import User, Item, Conversation, Message
 from . import db
 import os 
 import uuid
@@ -46,10 +46,27 @@ def posts():
 
     return render_template('post_creation.html')
  
+@views.route('/edit/<int:item_id>', methods=['GET','POST'])
+@login_required
+def edit_item(item_id):
+    item = Item.query.get_or_404(item_id)
+
+    if request.method == "POST":
+        item.image = request.files['item_images'] 
+        item.title = request.form['item_title']
+        item.description = request.form['item_description']
+        item.price = request.form['item_price']
+        item.category = request.form['item_category']
+        item.item_condition = request.form['item_condition']
+        item.location = request.form['item_location']
+        db.session.commit()
+        return redirect(url_for('views.home'))
+    
+    return render_template("edit_item.html", item=item)
 
 @views.route('/catalog', methods=['GET'])
 @login_required
-def catalog(): #added code to filter and search for posts
+def catalog():
 
 
 
@@ -77,10 +94,45 @@ def catalog(): #added code to filter and search for posts
         selected_category=category_filter
     ) 
 
-@views.route('/chat',methods=['GET','POST'])
+@views.route('/start_chat/<int:item_id>/<int:seller_id>')
+@login_required
+def start_chat(item_id, seller_id):
+    seller = User.query.get_or_404(seller_id)
+    item = Item.query.get_or_404(item_id)
+
+    conversation = Conversation.query.filter(
+    ((Conversation.user1_id == current_user.user_id) & (Conversation.user2_id == seller.user_id)) |
+    ((Conversation.user1_id == seller.user_id) & (Conversation.user2_id == current_user.user_id))
+    ).filter_by(item_id=item.item_id).first()
+
+
+    if not conversation:
+        conversation = Conversation(
+        item_id=item.item_id,
+        user1_id=current_user.user_id,
+        user2_id=seller.user_id
+    )
+    db.session.add(conversation)
+    db.session.commit()
+
+    return redirect(url_for('views.chatroom', chat_id=conversation.conversation_id))
+
+@views.route('/chatlog',methods=['GET','POST'])
 @login_required
 def chats():
-    return render_template('chatlog.html') 
+
+    chats = Conversation.query.filter(
+        (Conversation.user1_id == current_user.user_id) | (Conversation.user2_id == current_user.user_id)).all()
+    
+    return render_template('chatlog.html', chats=chats) 
+
+@views.route("/chat/<int:chat_id>")
+@login_required
+def chatroom(chat_id):
+    conversation = Conversation.query.get_or_404(chat_id)
+    messages = Message.query.filter_by(conversation_id=conversation.conversation_id).order_by(Message.created_at).all()
+
+    return render_template('chatroom.html', conversation=conversation, messages=messages)
 
 @views.route('/')
 def index():
@@ -91,14 +143,14 @@ def index():
 @login_required
 def item_detail(item_id):
     item = Item.query.get_or_404(item_id)
-    return render_template('item_detail.html', item=item)  # added by adam
+    return render_template('item_detail.html', item=item)
 
 @views.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
     if request.method == "POST":
         if "name" in request.form and "email" in request.form:
-            # Update profile info
+            
             current_user.name = request.form["name"]
             current_user.email = request.form["email"]
             db.session.commit()
@@ -109,9 +161,9 @@ def settings():
             new_pass = request.form["new_password"]
             confirm_pass = request.form["confirm_password"]
 
-            if current_user.password == current_pass:  # direct string compare
+            if current_user.password == current_pass:  
                 if new_pass == confirm_pass:
-                    current_user.password = new_pass   # store plain password
+                    current_user.password = new_pass   
                     db.session.commit()
                     flash("Password updated successfully!")
                 else:
@@ -122,9 +174,3 @@ def settings():
         return redirect('/settings')
 
     return render_template("settings.html", user=current_user)
-
-@views.route('/edit posts', methods=['GET','POST']) #edit post functionality
-@login_required
-def edit_posts():
-    
-    return render_template("edit_item.html")
