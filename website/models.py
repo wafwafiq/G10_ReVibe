@@ -16,7 +16,7 @@ class User(db.Model, UserMixin):
     def get_id(self):
         return str(self.user_id)
     
-class Item(db.Model): #code used for testing
+class Item(db.Model):
     __tablename__ = 'items'
 
     item_id = db.Column(db.Integer, primary_key=True, autoincrement=True)

@@ -57,7 +57,7 @@ def edit_item(item_id):
         item.description = request.form['item_description']
         item.price = request.form['item_price']
         item.category = request.form['item_category']
-        item.condition = request.form['item_condition']
+        item.item_condition = request.form['item_condition']
         item.location = request.form['item_location']
         db.session.commit()
         return redirect(url_for('views.home'))
@@ -94,39 +94,35 @@ def catalog():
         selected_category=category_filter
     ) 
 
-
-@views.route('/start_chat/<int:seller_id>') #code to start chat with seller
+@views.route('/start_chat/<int:seller_id>')
 @login_required
 def start_chat(seller_id):
-    
-    return redirect(url_for('chat', chat_id=chat.id))
+    seller = User.query.get_or_404(seller_id)
+
+
+    chat = (Chat.query
+            .filter(Chat.participants.any(id=current_user.id))
+            .filter(Chat.participants.any(id=seller.id)).first())
+
+
+    if not chat:
+        chat = Chat()
+        chat.participants.append(current_user)
+        chat.participants.append(seller)
+        db.session.add(chat)
+        db.session.commit()
+
+    return redirect(url_for('views.chatroom', chat_id=chat.id))
 
 @views.route('/chatlog',methods=['GET','POST'])
 @login_required
 def chats():
-
-    chats = Chat.query.filter(
-        (Chat.user1_id == current_user.id) | (Chat.user2_id == current_user.id)
-        ).all()
-    chat_data = []
-    for chat in chats:
-
-        if chat.user1_id == current_user.id:
-            partner = User.query.get(chat.user2_id)
-
-        else:
-            partner = User.query.get(chat.user1_id)
-    return render_template('chatlog.html') 
+    chats = Chat.query.filter(Chat.participants.any(id=current_user.id)).all()
+    return render_template('chatlog.html', chats=chats) 
 
 views.route("/chat/<int:chat_id>")
 @login_required
 def chatroom(chat_id):
-    chat = Chat.query.get_or_404(chat_id)
-
-    if current_user.id not in [chat.user_id, chat.user_id]:
-        return "You are not allowed to access this chat", 403
-    
-    messages = Message.query.filter_by(chat_id=chat.id).order_by(Message.timestamp).all()
 
     return render_template('chatroom.html', chat=chat, messages=messages)
 
