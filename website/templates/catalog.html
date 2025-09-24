@@ -46,7 +46,12 @@
                     {% endif %}
                     </div>
                     <div class="item-info">
-                        <h3 class="item-title">{{ item.title }}</h3>
+                        <div class="item-header">
+                            <h3 class="item-title">{{ item.title }}</h3>
+                            {% if item.is_sold %}
+                                <span class="sold-badge">SOLD</span>
+                            {% endif %}
+                        </div>
                         <p class="item-price">RM {{ item.price }}</p>
                         <p class="item-location">📍 {{ item.location }}</p>
                         <p class="item-condition">Condition: {{ item.item_condition }}</p>
@@ -257,5 +262,67 @@ document.getElementById("map-search").addEventListener("input", function() {
     updateMarkers();
 });
 </script>
+
+<style>
+/* Sold Badge Styles */
+.item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.item-title {
+    margin: 0;
+    flex: 1;
+}
+
+.sold-badge {
+    background-color: #e74c3c;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 0.5rem;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
+}
+
+/* Adjust item card opacity for sold items */
+.item-card:has(.sold-badge) {
+    opacity: 0.75;
+    position: relative;
+}
+
+.item-card:has(.sold-badge)::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(231, 76, 60, 0.1);
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .item-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .sold-badge {
+        margin-left: 0;
+        align-self: flex-end;
+    }
+}
+</style>
+
 {% endblock %}
 
