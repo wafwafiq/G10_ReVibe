@@ -9,7 +9,7 @@ import smtplib
 
 auth = Blueprint('auth', __name__)
 
-# --- Utilities ---
+
 def generate_token(email, salt, expires_sec=3600):
     s = URLSafeTimedSerializer(current_app.secret_key)
     return s.dumps(email, salt=salt)
