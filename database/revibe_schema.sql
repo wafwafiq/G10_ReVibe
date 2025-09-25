@@ -46,17 +46,17 @@ DROP TABLE IF EXISTS `items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `items` (
-  `item_id` int NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) NOT NULL,
-  `description` text,
-  `price` decimal(10,2) NOT NULL,
-  `category` varchar(100) DEFAULT NULL,
-  `item_condition` enum('new','used','refurbished') NOT NULL,
-  `location` varchar(150) DEFAULT NULL,
-  `seller_id` int NOT NULL,
-  `image_filename` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `status` enum('available','sold') NOT NULL DEFAULT 'available',
+  `item_id` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(255) NOT NULL,
+  `description` TEXT,
+  `price` DECIMAL(10,2) NOT NULL,
+  `category` VARCHAR(100) DEFAULT NULL,
+  `item_condition` ENUM('new','used','refurbished') NOT NULL,
+  `location` VARCHAR(150) DEFAULT NULL,
+  `seller_id` INT NOT NULL,
+  `image_filename` VARCHAR(255) DEFAULT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` ENUM('available','sold') NOT NULL DEFAULT 'available',
   PRIMARY KEY (`item_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
