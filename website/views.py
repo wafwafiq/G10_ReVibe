@@ -261,7 +261,7 @@ def admin_users():
 @views.route('/admin/posts')
 def admin_posts():
     items = Item.query.order_by(Item.created_at.desc()).all()
-    return render_template('admin_posts.html', items=items)
+    return render_template('admin_posts.html', posts=items)
 
 @views.route('/admin/delete_user/<int:user_id>', methods=['POST'])
 def admin_delete_user(user_id):
