@@ -28,6 +28,7 @@ class Item(db.Model):
     location = db.Column(db.String(150))
     seller_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     image_filename = db.Column(db.String(255), nullable=True)
+    is_sold = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
     seller = db.relationship('User', backref='items')
