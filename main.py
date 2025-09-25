@@ -20,4 +20,4 @@ if __name__ == "__main__":
             db.session.add(test_user)
             db.session.commit()
 
-    socketio.run(app, debug=True) #changed to socketio.run to enable Flask-SocketIO
+    socketio.run(app, debug=True)

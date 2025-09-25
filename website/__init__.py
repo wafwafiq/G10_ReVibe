@@ -16,6 +16,13 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.secret_key = "your_secret_key"
 
+    app.config['MAIL_USERNAME'] = 'revibe.app.mail@gmail.com'
+    app.config['MAIL_PASSWORD'] = 'clytqfinttxmqgad'
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    app.config['MAIL_PORT'] = 587
+    app.config['MAIL_USE_TLS'] = True
+    app.config['MAIL_DEFAULT_SENDER'] = ('ReVibe App', 'revibe.app.mail@gmail.com')
+
     db.init_app(app)
     mail.init_app(app)
     socketio.init_app(app, cors_allowed_origins="*")
