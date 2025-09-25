@@ -9,6 +9,7 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
+    confirmed = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow)
     def __repr__(self):
         return f"<User {self.name}>"
@@ -29,6 +30,7 @@ class Item(db.Model):
     seller_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     image_filename = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
+    is_sold = db.Column(db.Boolean, default=False, nullable=False)  # <-- new column
 
     seller = db.relationship('User', backref='items')
 
