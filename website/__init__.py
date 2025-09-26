@@ -18,12 +18,15 @@ def create_app():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True) 
     app.secret_key = "your_secret_key"
 
-    app.config['MAIL_USERNAME'] = 'revibe.app.mail@gmail.com'
-    app.config['MAIL_PASSWORD'] = 'clytqfinttxmqgad'
-    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    app.config['MAIL_SERVER'] = 'smtp-relay.brevo.com'
     app.config['MAIL_PORT'] = 587
     app.config['MAIL_USE_TLS'] = True
-    app.config['MAIL_DEFAULT_SENDER'] = ('ReVibe App', 'revibe.app.mail@gmail.com')
+    app.config['MAIL_USE_SSL'] = False
+    app.config['MAIL_USERNAME'] = '97ee25002@smtp-brevo.com'  # Brevo login
+    app.config['MAIL_PASSWORD'] = 'xsmtpsib-abc60c9036f2a6cb67056e2bf7e919d77eceda81ea7a295d6e82483ba814c44e-YgaLzBQ6qjhs5RcV'             # the SMTP key (you pasted above)
+    app.config['MAIL_DEFAULT_SENDER'] = ('No Reply - ReVibe', 'revibe.app.mail@gmail.com')  # Verified sender
+    app.config['MAIL_DEBUG'] = True
+
 
     db.init_app(app)
     mail.init_app(app)
