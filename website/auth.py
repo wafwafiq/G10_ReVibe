@@ -42,6 +42,11 @@ def sign_up():
         password = request.form.get('password')
         confirmPassword = request.form.get('confirm_password')
 
+        # Validate all required fields are provided
+        if not email or not name or not password or not confirmPassword:
+            flash("Please fill in all required fields", category="error")
+            return redirect(url_for('auth.sign_up'))
+
         if password != confirmPassword:
             flash("Passwords do not match!", category="error")
             return redirect(url_for('auth.sign_up'))
@@ -87,6 +92,10 @@ def login():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
+
+        if not email or not password:
+            flash("Please provide both email and password", category="error")
+            return redirect(url_for('auth.login'))
 
         user = User.query.filter_by(email=email, password=password).first()
         if user:
