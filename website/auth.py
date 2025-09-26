@@ -87,6 +87,8 @@ def sign_up():
 @auth.route('/login', methods=['GET','POST'])
 def login():
     if current_user.is_authenticated: 
+        if current_user.is_admin:
+            return redirect(url_for('views.admin_main'))
         return redirect(url_for('views.home'))
     
     if request.method == 'POST':
@@ -99,13 +101,17 @@ def login():
 
         user = User.query.filter_by(email=email, password=password).first()
         if user:
-            if not user.confirmed:
+            if not user.confirmed and not user.is_admin:
                 flash("Please confirm your email before logging in.", category="warning")
                 return redirect(url_for('auth.login'))
 
             flash(f"Welcome {user.name}!", category="success")
             login_user(user, remember=True)
-            return redirect(url_for('views.home'))
+
+            if user.is_admin:
+                return redirect(url_for('views.admin_main'))
+            else:
+                return redirect(url_for('views.home'))
         else:
             flash("Invalid email or password", category="error")
             return redirect(url_for('auth.login'))

@@ -10,6 +10,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     confirmed = db.Column(db.Boolean, default=False)
+    is_admin = db.Column(db.Boolean, nullable=True, default=False)
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow)
     def __repr__(self):
         return f"<User {self.name}>"
