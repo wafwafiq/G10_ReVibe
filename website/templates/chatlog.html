@@ -16,12 +16,16 @@
             <!-- Dynamic conversation list from backend -->
             {% if conversations %}
                 {% for conversation in conversations %}
-                <div class="conversation-item">
+                <a href="{{ url_for('views.chatroom', conversation_id=conversation.conversation_id) }}" class="conversation-item">
                     <!-- Item thumbnail section -->
                     <div class="conversation-item-image">
-                        <img src="{{ conversation.item.image_url if conversation.item.image_url else '/static/images/placeholder-item.jpg' }}" 
+                        {% if conversation.item.image_filename%}
+                        <img src="{{ url_for('static', filename='uploads/' ~ conversation.item.image_filename) }}" 
                              alt="{{ conversation.item.title }}" 
                              class="item-thumbnail">
+                         {% else %}
+                        <div class="image-placeholder"> </div>
+                        {% endif %}
                     </div>
                     
                     <!-- Conversation details section -->
@@ -34,8 +38,13 @@
                         
                         <!-- Last message preview -->
                         <div class="last-message">
-                            <p class="message-text">{{ conversation.last_message.content[:50] }}...</p>
+                            {% if conversation.last_message %}
+                            <p class="message-text">{{ conversation.last_message.content[:50] }}{% if conversation.last_message.content|length > 50 %}...{% endif %}</p>
                             <span class="message-time">{{ conversation.last_message.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                            {% else %}
+                            <p class="message-text">No Messages yet</p>
+                            <span class="message-time">{{ conversation.created_at.strftime('%B %d, %Y') }}</span>
+                            {% endif %}
                         </div>
                     </div>
                     
@@ -45,7 +54,7 @@
                             <span class="unread-badge">{{ conversation.unread_count }}</span>
                         {% endif %}
                     </div>
-                </div>
+                </a>
                 {% endfor %}
             {% else %}
             <!-- Empty state when no conversations exist -->

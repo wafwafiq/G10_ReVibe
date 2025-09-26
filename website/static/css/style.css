@@ -1395,9 +1395,7 @@ body {
 }
 
 .item-condition {
-    position: absolute;
-    top: 10px;
-    right: 10px;
+    /* Removed absolute positioning that was causing text to appear in top-right corner */
     background: rgba(220, 20, 60, 0.9);
     color: var(--white);
     padding: 0.3rem 0.8rem;
@@ -2146,12 +2144,33 @@ body {
 /* ========================================
    [ITEM-DETAIL] Item Detail Page Styles 
    ======================================== */
-.item-detail-page { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-.breadcrumb { margin-bottom: 2rem; }
+.item-detail-page { 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.breadcrumb { 
+    margin-bottom: 2rem; 
+    width: 100%;
+    text-align: left;
+}
 .breadcrumb-link { color: var(--primary-red); text-decoration: none; }
 .breadcrumb-link:hover { color: var(--primary-blue); }
 
-.item-detail-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.item-detail-container { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 2rem; 
+    padding: 2rem; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    background: white;
+    width: 100%;
+    max-width: 1000px;
+}
 
 .photo-gallery { display: flex; flex-direction: column; gap: 1rem; }
 .main-photo { height: 400px; border-radius: 12px; background: var(--light-gray); display: flex; align-items: center; justify-content: center; }

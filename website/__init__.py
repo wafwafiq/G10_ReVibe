@@ -1,13 +1,15 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from flask_mail import Mail
 from flask_socketio import SocketIO
+from flask_mail import Mail
 import os
+from dotenv import load_dotenv
+load_dotenv()  # loads variables from .env into os.environ
 db = SQLAlchemy()
 login_manager = LoginManager()
-mail = Mail()
 socketio = SocketIO()
+mail = Mail()
 
 def create_app(): 
     app = Flask(__name__)
@@ -15,22 +17,22 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:AMwyeRlQEsnViGvcDPiUITbFeuAXaAlv@turntable.proxy.rlwy.net:47657/railway'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = os.path.join('website', 'static', 'uploads')
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True) 
-    app.secret_key = "your_secret_key"
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    app.secret_key = os.getenv("SECRET_KEY")
 
     app.config['MAIL_SERVER'] = 'smtp-relay.brevo.com'
     app.config['MAIL_PORT'] = 587
     app.config['MAIL_USE_TLS'] = True
     app.config['MAIL_USE_SSL'] = False
-    app.config['MAIL_USERNAME'] = '97ee25002@smtp-brevo.com'  # Brevo login
-    app.config['MAIL_PASSWORD'] = 'xsmtpsib-abc60c9036f2a6cb67056e2bf7e919d77eceda81ea7a295d6e82483ba814c44e-YgaLzBQ6qjhs5RcV'             # the SMTP key (you pasted above)
+    app.config['MAIL_USERNAME'] = os.getenv("BREVO_SMTP_USER")
+    app.config['MAIL_PASSWORD'] = os.getenv("BREVO_SMTP_KEY")
     app.config['MAIL_DEFAULT_SENDER'] = ('No Reply - ReVibe', 'revibe.app.mail@gmail.com')  # Verified sender
     app.config['MAIL_DEBUG'] = True
 
 
     db.init_app(app)
     mail.init_app(app)
-    socketio.init_app(app)
+    socketio.init_app(app, cors_allowed_origins="*")
 
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
@@ -46,15 +48,6 @@ def create_app():
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/auth')
-
-
-    @app.after_request
-    def add_header(response):
-        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-        response.headers["Pragma"] = "no-cache"
-        response.headers["Expires"] = "0"
-        return response
-
 
 
     return app

@@ -9,7 +9,7 @@ import smtplib
 
 auth = Blueprint('auth', __name__)
 
-# --- Utilities ---
+
 def generate_token(email, salt, expires_sec=3600):
     s = URLSafeTimedSerializer(current_app.secret_key)
     return s.dumps(email, salt=salt)
@@ -63,16 +63,6 @@ def sign_up():
         db.session.add(new_user)
         db.session.commit()
 
-        # generate confirmation token
-        token = generate_token(new_user.email, salt="email-confirm")
-        confirm_url = url_for('auth.confirm_email', token=token, _external=True)
-        html = f"<p>Welcome {new_user.name},</p><p>Click <a href='{confirm_url}'>here</a> to confirm your account.</p>"
-
-        # send email and flash only once
-        if send_email("Confirm Your Email", [new_user.email], body="Please confirm your email", html=html):
-            flash("Account created successfully! Please check your email.", category="success")
-        else:
-            flash("Account created, but email service is not available. Please try again later.", category="warning")
 
         return redirect(url_for('auth.login'))
 
@@ -90,9 +80,6 @@ def login():
 
         user = User.query.filter_by(email=email, password=password).first()
         if user:
-            if not user.confirmed:
-                flash("Please confirm your email before logging in.", category="warning")
-                return redirect(url_for('auth.login'))
 
             flash(f"Welcome {user.name}!", category="success")
             login_user(user, remember=True)
@@ -109,25 +96,6 @@ def login():
 def logout():
     logout_user()
     flash("Logged out successfully", category="success")
-    return redirect(url_for('auth.login'))
-
-# --- Confirm Email ---
-@auth.route('/confirm/<token>')
-def confirm_email(token):
-    email = verify_token(token, salt="email-confirm")
-    if not email:
-        flash("The confirmation link is invalid or has expired.", category="error")
-        return redirect(url_for('auth.login'))
-
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        flash("User not found.", category="error")
-        return redirect(url_for('auth.login'))
-
-    user.confirmed = True
-    db.session.commit()
-
-    flash("Your account has been confirmed! You can now log in.", category="success")
     return redirect(url_for('auth.login'))
 
 # --- Request reset ---

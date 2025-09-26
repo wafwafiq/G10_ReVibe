@@ -111,7 +111,19 @@
 
             <!-- Contact Actions -->
             <div class="contact-actions">
-                {% if item.is_sold %}
+                {% if item.seller_id == current_user.user_id %}
+                    <!-- Owner's Item - Edit Option -->
+                    <div class="owner-notice">
+                        <div class="owner-icon">👤</div>
+                        <div class="owner-content">
+                            <h4>This is your item</h4>
+                            <p>You can edit or manage this item from your dashboard.</p>
+                            <a href="{{ url_for('views.edit_item', item_id=item.item_id) }}" class="btn-edit-item">
+                                ✏️ Edit Item
+                            </a>
+                        </div>
+                    </div>
+                {% elif item.is_sold %}
                     <!-- Sold Item - Contact Disabled -->
                     <div class="sold-notice">
                         <div class="sold-icon">✅</div>
@@ -238,6 +250,53 @@
 }
 
 .btn-browse-similar:hover {
+    background-color: #2980b9;
+    transform: translateY(-1px);
+}
+
+/* Owner Notice Styles */
+.owner-notice {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    border: 2px solid #3498db;
+    border-radius: 12px;
+    text-align: left;
+}
+
+.owner-icon {
+    font-size: 3rem;
+    color: #3498db;
+    flex-shrink: 0;
+}
+
+.owner-content h4 {
+    color: #2c3e50;
+    font-size: 1.3rem;
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+}
+
+.owner-content p {
+    color: #666;
+    margin: 0 0 1.5rem 0;
+    line-height: 1.5;
+}
+
+.btn-edit-item {
+    display: inline-block;
+    background-color: #3498db;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.btn-edit-item:hover {
     background-color: #2980b9;
     transform: translateY(-1px);
 }
