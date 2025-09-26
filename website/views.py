@@ -194,7 +194,6 @@ def chats():
     for conversation in conversations:
         conversation.other_user = conversation.get_other_user(current_user.user_id)
         conversation.last_message = conversation.get_last_message()
-        conversation.unread_count = conversation.get_unread_count(current_user.user_id)
         processed_conversations.append(conversation)
     
     return render_template('chatlog.html', conversations=processed_conversations) 
