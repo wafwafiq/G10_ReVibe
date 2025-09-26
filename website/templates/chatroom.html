@@ -94,12 +94,17 @@ BACKEND REQUIREMENTS FOR WAFIQ:
         <!-- Chat status indicator -->
         <div class="chat-status">
             <div class="status-indicator">
-                <span class="status-dot active"></span>
-                <span class="status-text">Discussion in progress</span>
+                {% if conversation and conversation.item and conversation.item.is_sold %}
+                    <span class="status-dot concluded"></span>
+                    <span class="status-text">Discussion concluded</span>
+                {% else %}
+                    <span class="status-dot active"></span>
+                    <span class="status-text">Discussion in progress</span>
+                {% endif %}
             </div>
             
-            <!-- Mark as sold button (for seller only) -->
-            {% if current_user.is_authenticated and conversation and conversation.item and current_user.user_id == conversation.item.seller_id %}
+            <!-- Mark as sold button (for seller only, and only if not already sold) -->
+            {% if current_user.is_authenticated and conversation and conversation.item and current_user.user_id == conversation.item.seller_id and not conversation.item.is_sold %}
             <div class="seller-actions">
                 <button class="mark-sold-btn">
                     ✅ Mark as Sold

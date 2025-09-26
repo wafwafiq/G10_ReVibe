@@ -2628,6 +2628,10 @@ body {
     background: var(--success-color);
 }
 
+.status-dot.concluded {
+    background: var(--secondary-color);
+}
+
 .status-text {
     font-size: 0.8rem;
     color: var(--medium-gray);
