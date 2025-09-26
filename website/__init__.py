@@ -22,9 +22,9 @@ def create_app():
     app.config['MAIL_PORT'] = 587
     app.config['MAIL_USE_TLS'] = True
     app.config['MAIL_USE_SSL'] = False
-    app.config['MAIL_USERNAME'] = '97ee25002@smtp-brevo.com'  # Brevo login
-    app.config['MAIL_PASSWORD'] = 'xsmtpsib-abc60c9036f2a6cb67056e2bf7e919d77eceda81ea7a295d6e82483ba814c44e-YgaLzBQ6qjhs5RcV'             # the SMTP key (you pasted above)
-    app.config['MAIL_DEFAULT_SENDER'] = ('No Reply - ReVibe', 'revibe.app.mail@gmail.com')  # Verified sender
+    app.config['MAIL_USERNAME'] = '97f16d001@smtp-brevo.com'  # Brevo login
+    app.config['MAIL_PASSWORD'] = 'xsmtpsib-42e8d8053bbebf7e3c3ca45b004d0c7f9f3c9f20e63440c8f0df56fc4e067738-Sjc8QyVnfdJUC149'             # the SMTP key (you pasted above)
+    app.config['MAIL_DEFAULT_SENDER'] = ('No Reply - ReVibe', 'revibe.app.mail@gmail.com')
     app.config['MAIL_DEBUG'] = True
 
 
