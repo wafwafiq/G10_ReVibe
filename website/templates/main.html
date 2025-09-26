@@ -70,7 +70,12 @@
                     <!-- Item information display -->
                     <div class="item-info">
                         <!-- Item title from database -->
-                        <h3 class="item-title">{{ item.title }}</h3>
+                        <h3 class="item-title">
+                            {{ item.title }}
+                            {% if item.is_sold %}
+                                <span class="sold-badge">SOLD</span>
+                            {% endif %}
+                        </h3>
                         
                         <!-- Price formatted with RM prefix -->
                         <p class="item-price">RM {{ item.price }}</p>
@@ -83,6 +88,13 @@
                         
                         <!-- Posted date formatted -->
                         <p class="item-time">Posted {{ item.created_at.strftime('%B %d, %Y') }}</p>
+                        
+                        <!-- Status indicator -->
+                        {% if item.is_sold %}
+                            <p class="item-status sold">Status: Sold</p>
+                        {% else %}
+                            <p class="item-status available">Status: Available</p>
+                        {% endif %}
                     </div>
                     
                     <!-- Action buttons for each item -->
