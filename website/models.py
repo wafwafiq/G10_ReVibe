@@ -9,6 +9,8 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
+    confirmed = db.Column(db.Boolean, nullable=False, default=False)  # tinyint(1) → Boolean
+    is_admin = db.Column(db.Boolean, nullable=True, default=False)    # tinyint(1) → Boolean
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow)
     def __repr__(self):
         return f"<User {self.name}>"
