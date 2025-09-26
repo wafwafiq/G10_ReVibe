@@ -214,7 +214,7 @@ BACKEND REQUIREMENTS FOR WAFIQ:
     });
 
 
-    socket.on("message", function(data) {
+    socket.on("receive_message", function(data) {
         if (data.sender_id !== currentUserId) {
             addMessageToUI(data.content, false, formatTime(new Date()));
         }
