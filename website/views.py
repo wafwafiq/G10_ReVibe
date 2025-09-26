@@ -194,7 +194,6 @@ def chats():
     for conversation in conversations:
         conversation.other_user = conversation.get_other_user(current_user.user_id)
         conversation.last_message = conversation.get_last_message()
-        conversation.unread_count = conversation.get_unread_count(current_user.user_id)
         processed_conversations.append(conversation)
     
     return render_template('chatlog.html', conversations=processed_conversations) 
@@ -267,7 +266,7 @@ def admin_posts():
 def admin_delete_user(user_id):
     user = User.query.get_or_404(user_id)
     try:
-        # Delete user's items and related data
+        
         for item in user.items:
             conversations = Conversation.query.filter_by(item_id=item.item_id).all()
             for conversation in conversations:
@@ -275,7 +274,7 @@ def admin_delete_user(user_id):
                 db.session.delete(conversation)
             db.session.delete(item)
         
-        # Delete conversations where user participated
+
         conversations = Conversation.query.filter(
             (Conversation.user1_id == user_id) | (Conversation.user2_id == user_id)
         ).all()
@@ -296,7 +295,7 @@ def admin_delete_user(user_id):
 def admin_delete_post(item_id):
     item = Item.query.get_or_404(item_id)
     try:
-        # Delete related conversations and messages
+        
         conversations = Conversation.query.filter_by(item_id=item_id).all()
         for conversation in conversations:
             Message.query.filter_by(conversation_id=conversation.conversation_id).delete()
