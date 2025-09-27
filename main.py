@@ -6,6 +6,8 @@ app = create_app()
 
 if __name__ == "__main__":
     with app.app_context():
+        import eventlet
+        import eventlet.wsgi
         db.create_all()
         create_admin()
         db.reflect()
@@ -19,4 +21,4 @@ if __name__ == "__main__":
             db.session.add(test_user)
             db.session.commit()
     
-    socketio.run(app, debug=True)
+    socketio.run(app, host="0.0.0.0", port=5000)
