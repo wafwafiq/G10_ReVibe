@@ -163,13 +163,13 @@ var locationGroups = {};
         locationGroups[loc] = [];
     }
     locationGroups[loc].push({
-        id: "{{ item.item_id }}",
-        title: "{{ item.title }}",
-        price: "{{ item.price }}",
-        category: "{{ item.category|lower }}",
-        condition: "{{ item.item_condition }}",
-        image: "{{ item.images[0] if item.images else '' }}"
-    });
+    id: "{{ item.item_id }}",
+    title: "{{ item.title }}",
+    price: "{{ item.price }}",
+    category: "{{ item.category|lower }}",
+    condition: "{{ item.item_condition }}",
+    image: "{{ url_for('views.uploaded_file', filename=item.image_filename) if item.image_filename else '' }}"
+});
 {% endif %}
 {% endfor %}
 
@@ -326,4 +326,3 @@ document.getElementById("map-search").addEventListener("input", function() {
 </style>
 
 {% endblock %}
-

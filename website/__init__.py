@@ -16,7 +16,13 @@ def create_app():
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:AMwyeRlQEsnViGvcDPiUITbFeuAXaAlv@turntable.proxy.rlwy.net:47657/railway'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
+    
+    # Use Railway volume in production, local folder in development
+    if os.path.exists('/app'):  # Railway environment
+        app.config['UPLOAD_FOLDER'] = '/app/uploads'
+    else:  # Local development
+        app.config['UPLOAD_FOLDER'] = os.path.join('website', 'static', 'uploads')
+    
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     app.secret_key = "your_secret_key"
@@ -32,7 +38,6 @@ def create_app():
         os.getenv('MAIL_SENDER_EMAIL')
     )
     app.config['MAIL_DEBUG'] = os.getenv('MAIL_DEBUG', 'False') == 'True'
-
 
     db.init_app(app)
     mail.init_app(app)
@@ -72,3 +77,4 @@ def create_admin():#defined admin account
         )
          db.session.add(admin)
          db.session.commit()
+         
