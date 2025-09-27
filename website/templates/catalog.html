@@ -120,9 +120,16 @@ var campusLocations = {
 
 // === Map setup ===
 var map = L.map('map', {
-    center: [2.927401, 101.642075],  
-    zoom: 17,
-    zoomControl: true
+    center: [2.927445, 101.641645],
+    zoom: 16,
+    zoomControl: true,
+    minZoom: 15,
+    maxZoom: 19,
+    maxBounds: [
+        [2.922, 101.638], // Southwest corner
+        [2.933, 101.648]  // Northeast corner
+    ],
+    maxBoundsViscosity: 1.0 // "rubber band" effect (1.0 = strict lock)
 });
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
