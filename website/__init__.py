@@ -72,4 +72,4 @@ def create_admin():#defined admin account
         )
          db.session.add(admin)
          db.session.commit()
-        
+          
