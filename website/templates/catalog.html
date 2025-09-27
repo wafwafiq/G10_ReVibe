@@ -6,6 +6,33 @@
 <div class="catalog-page">
     <h1 class="page-title">Browse Catalog</h1>
 
+    <!-- Interactive Map Section -->
+    <div class="map-section">
+        <h2 class="section-title">Items on Map</h2>
+        <div class="map-container">
+            
+            <!-- Sidebar -->
+            <div id="sidebar">
+                <h3>Items</h3>
+                <input type="text" id="map-search" placeholder="🔍 Search items...">
+                <select id="map-category">
+                    <option value="all">All Categories</option>
+                    <option value="books">Books</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="furniture">Furniture</option>
+                    <option value="clothing">Clothing</option>
+                    <option value="sports">Sports</option>
+                    <option value="kitchen">Kitchen</option>
+                </select>
+                <!-- Sidebar list -->
+                <ul class="map-item-list" id="map-item-list"></ul>
+            </div>
+
+            <!-- Map -->
+            <div id="map"></div>
+        </div>
+    </div>
+
     <!-- Search and filter section -->
 
 
@@ -71,32 +98,6 @@
                 </div>
             {% endif %}
         </div>
-    </div>
-</div>
-
-<div class="map-section">
-    <h2 class="section-title">Items on Map</h2>
-    <div class="map-container">
-        
-        <!-- Sidebar -->
-        <div id="sidebar">
-            <h3>Items</h3>
-            <input type="text" id="map-search" placeholder="🔍 Search items...">
-            <select id="map-category">
-                <option value="all">All Categories</option>
-                <option value="books">Books</option>
-                <option value="electronics">Electronics</option>
-                <option value="furniture">Furniture</option>
-                <option value="clothing">Clothing</option>
-                <option value="sports">Sports</option>
-                <option value="kitchen">Kitchen</option>
-            </select>
-            <!-- Sidebar list -->
-            <ul class="map-item-list" id="map-item-list"></ul>
-        </div>
-
-        <!-- Map -->
-        <div id="map"></div>
     </div>
 </div>
 {% endblock %}

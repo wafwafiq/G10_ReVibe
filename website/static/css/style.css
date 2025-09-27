@@ -2637,20 +2637,6 @@ body {
     color: var(--medium-gray);
 }
 
-.mark-sold-btn {
-    background: var(--success-color);
-    color: white;
-    border: none;
-    padding: 0.4rem 0.8rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.mark-sold-btn:hover {
-    background: #27ae60;
-}
 
 /* Messages Container */
 .messages-container {
@@ -2677,15 +2663,16 @@ body {
 
 .message-bubble.sent {
     align-self: flex-end;
-    background: var(--primary-blue);
-    color: white;
+    background: #F5F5F5;
+    color: #333333;
     border-bottom-right-radius: 6px;
 }
 
 .message-bubble.received {
     align-self: flex-start;
-    background: var(--light-gray);
-    color: var(--dark-gray);
+    background: #FFFFFF;
+    color: #666666;
+    border: 1px solid #E0E0E0;
     border-bottom-left-radius: 6px;
 }
 
@@ -2803,7 +2790,7 @@ body {
 }
 
 .send-btn:hover {
-    background: #1e40af;
+    background: #76787e;
     transform: scale(1.05);
 }
 
