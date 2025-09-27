@@ -209,7 +209,7 @@ def chatroom(conversation_id):
 @views.route('/')
 def index():
     users = User.query.all()
-    return '<br>'.join([f"{u.user_id} - {u.name} ({u.email})" for u in users])
+    return redirect(url_for('auth.signup'))
 
 @views.route('/item/<int:item_id>')
 @login_required
