@@ -42,6 +42,9 @@ def create_app():
     brevo_key = os.getenv("BREVO_API_KEY")
     if not brevo_key:
         raise RuntimeError("❌ BREVO_API_KEY not set in .env")
+    
+    configuration = sib_api_v3_sdk.Configuration()
+    configuration.api_key['api-key'] = brevo_key
 
     # Store the Brevo client on the Flask app object
     app.brevo_client = sib_api_v3_sdk.ApiClient(configuration)
