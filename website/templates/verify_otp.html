@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Verify OTP - ReVibe{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <h2 class="auth-title">Verify OTP</h2>
+    <p class="auth-subtitle">Enter the OTP sent to your email: {{ email }}</p>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="otp" class="form-label">OTP Code</label>
+            <input 
+                type="text" 
+                id="otp" 
+                name="otp" 
+                class="form-input" 
+                placeholder="Enter OTP"
+                required
+            >
+        </div>
+        
+        <button type="submit" class="btn">Verify OTP</button>
+    </form>
+    
+    <a href="{{ url_for('auth.reset_request') }}" class="auth-link">Back to Email Entry</a>
+</div>
+{% endblock %}

@@ -259,7 +259,7 @@ def admin_main():
 @views.route('/admin/users')
 @login_required
 def admin_users():
-    users = User.query.order_by(User.name).all()
+    users = User.query.filter_by(is_admin=False).order_by(User.name).all()
     return render_template('admin_users.html', users=users)
 
 @views.route('/admin/posts')
