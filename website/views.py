@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template , request, redirect, url_for, current_app, flash
+from flask import Blueprint, render_template , request, redirect, url_for, current_app, flash, send_from_directory
 from flask_login import login_required, current_user
 from .models import User, Item, Conversation, Message
 from flask_socketio import join_room, leave_room, send
@@ -353,3 +353,12 @@ def handle_message(data):
     except Exception as e:
         print(f"Error in handle_message: {e}")
         socketio.emit('error', {'message': 'Failed to send message'}, room=request.sid)
+
+# Route to serve uploaded files (fixes cloud deployment image issue)
+@views.route('/uploads/<filename>')
+def uploaded_file(filename):
+    """Serve uploaded files from the uploads directory"""
+    # Security: prevent directory traversal
+    if '..' in filename or '/' in filename or '\\' in filename:
+        return "Invalid filename", 400
+    return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)

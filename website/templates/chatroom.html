@@ -2,25 +2,6 @@
 
 {% block title %}Chat - ReVibe{% endblock %}
 
-<!--
-BACKEND REQUIREMENTS FOR WAFIQ:
-
-1. CHATROOM ROUTE (/chat/<int:chat_id>) needs to pass these variables:
-   - conversation: Conversation object with relationships loaded
-   - messages: List of Message objects for this conversation
-   
-2. Required relationships in models.py:
-   - Conversation.item relationship to Item model
-   - Conversation.user1 relationship to User model  
-   - Conversation.user2 relationship to User model
-       
-4. Template expects:
-   - conversation.user1_id, conversation.user2_id
-   - conversation.item.title, conversation.item.price, conversation.item.image_filename
-   - conversation.item.item_id, conversation.item.seller_id
-   - messages list with sender_id, content, created_at
--->
-
 {% block content %}
 <div class="chatroom-page">
     <!--Shows who you're chatting with and navigation -->
@@ -94,17 +75,12 @@ BACKEND REQUIREMENTS FOR WAFIQ:
         <!-- Chat status indicator -->
         <div class="chat-status">
             <div class="status-indicator">
-                {% if conversation and conversation.item and conversation.item.is_sold %}
-                    <span class="status-dot concluded"></span>
-                    <span class="status-text">Discussion concluded</span>
-                {% else %}
-                    <span class="status-dot active"></span>
-                    <span class="status-text">Discussion in progress</span>
-                {% endif %}
+                <span class="status-dot active"></span>
+                <span class="status-text">Discussion in progress</span>
             </div>
             
-            <!-- Mark as sold button (for seller only, and only if not already sold) -->
-            {% if current_user.is_authenticated and conversation and conversation.item and current_user.user_id == conversation.item.seller_id and not conversation.item.is_sold %}
+            <!-- Mark as sold button (for seller only) -->
+            {% if current_user.is_authenticated and conversation and conversation.item and current_user.user_id == conversation.item.seller_id %}
             <div class="seller-actions">
                 <button class="mark-sold-btn">
                     ✅ Mark as Sold
