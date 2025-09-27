@@ -43,7 +43,7 @@
             <!-- Item image -->
             <div class="context-item-image">
                 {% if conversation and conversation.item and conversation.item.image_filename %}    
-                    <img src="{{ url_for('static', filename='uploads/' ~ conversation.item.image_filename) }}" 
+                    <img src="{{ url_for('views.uploaded_file', filename=conversation.item.image_filename) }}" 
                          alt="{{ conversation.item.title }}" 
                          class="item-thumbnail">
                 {% else %}

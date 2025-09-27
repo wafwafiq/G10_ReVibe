@@ -39,7 +39,7 @@
                 <div class="item-card">
                         <div class="item-image"> <!-- image placeholder -->
                          {% if item.image_filename %} 
-                         <img src="{{ url_for('static', filename='uploads/' + item.image_filename) }}" 
+                         <img src="{{ url_for('views.uploaded_file', filename=item.image_filename) }}" 
                             alt="{{ item.title }}" class="item-img">
                     {% else %}
                         <div class="image-placeholder">📦</div>
