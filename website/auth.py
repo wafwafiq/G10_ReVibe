@@ -35,7 +35,7 @@ def verify_token(token, salt, max_age=3600):
 
 # --- Brevo Email Sender ---
 def send_email(subject, recipients, body, html=None):
-    sender = {"email": "revibeapp@gmail.com", "name": "Revibe"}
+    sender = {"email": "noonewantsthisname725@gmail.com", "name": "Revibe"}  # ✅ verified
     to = [{"email": r} for r in recipients]
 
     email = sib_api_v3_sdk.SendSmtpEmail(
@@ -51,7 +51,7 @@ def send_email(subject, recipients, body, html=None):
         print("✅ Email sent! Message ID:", response.message_id)
         return True
     except ApiException as e:
-        print("❌ Error sending email:", e)
+        print("❌ Error sending email:", e.body)
         return False
 
 
