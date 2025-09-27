@@ -48,10 +48,10 @@ def send_email(subject, recipients, body, html=None):
 
     try:
         response = email_api.send_transac_email(email)
-        print("Email sent! Message ID:", response['messageId'])
+        print("✅ Email sent! Message ID:", response.message_id)
         return True
     except ApiException as e:
-        print("Error sending email:", e)
+        print("❌ Error sending email:", e)
         return False
 
 
