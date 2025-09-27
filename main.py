@@ -1,4 +1,4 @@
-from website import create_app
+from website import create_app, create_admin
 from website import db, socketio
 from website.models import User
 
@@ -7,6 +7,7 @@ app = create_app()
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+        create_admin()
         db.reflect()
         if not User.query.first():
             test_user = User(

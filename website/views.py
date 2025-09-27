@@ -249,24 +249,31 @@ def settings():
 
 
 @views.route('/admin')
+@login_required
 def admin_main():
+    if not current_user.is_admin:
+        flash("Access denied", "error")
+        return redirect(url_for('auth.login'))
     return render_template('main_admin.html')
 
 @views.route('/admin/users')
+@login_required
 def admin_users():
     users = User.query.order_by(User.name).all()
     return render_template('admin_users.html', users=users)
 
 @views.route('/admin/posts')
+@login_required
 def admin_posts():
     items = Item.query.order_by(Item.created_at.desc()).all()
     return render_template('admin_posts.html', posts=items)
 
 @views.route('/admin/delete_user/<int:user_id>', methods=['POST'])
+@login_required
 def admin_delete_user(user_id):
     user = User.query.get_or_404(user_id)
     try:
-        # Delete user's items and related data
+        
         for item in user.items:
             conversations = Conversation.query.filter_by(item_id=item.item_id).all()
             for conversation in conversations:
@@ -274,7 +281,7 @@ def admin_delete_user(user_id):
                 db.session.delete(conversation)
             db.session.delete(item)
         
-        # Delete conversations where user participated
+
         conversations = Conversation.query.filter(
             (Conversation.user1_id == user_id) | (Conversation.user2_id == user_id)
         ).all()
@@ -292,10 +299,11 @@ def admin_delete_user(user_id):
     return redirect(url_for('views.admin_users'))
 
 @views.route('/admin/delete_post/<int:item_id>', methods=['POST'])
+@login_required
 def admin_delete_post(item_id):
     item = Item.query.get_or_404(item_id)
     try:
-        # Delete related conversations and messages
+        
         conversations = Conversation.query.filter_by(item_id=item_id).all()
         for conversation in conversations:
             Message.query.filter_by(conversation_id=conversation.conversation_id).delete()
