@@ -361,10 +361,10 @@ def handle_message(data):
         print(f"Error in handle_message: {e}")
         socketio.emit('error', {'message': 'Failed to send message'}, room=request.sid)
 
-# Route to serve uploaded files FOR cloud deployment image issue
+# Route FOR Railway volume
 @views.route('/uploads/<filename>')
 def uploaded_file(filename):
-    """Serve uploaded files from the uploads directory"""
+    """Serve uploaded files from the uploads directory (Railway volume or local)"""
     # Security: prevent directory traversal
     if '..' in filename or '/' in filename or '\\' in filename:
         return "Invalid filename", 400
