@@ -216,5 +216,5 @@ def reset_password_form(email):
         flash("Password has been reset. You can now log in.", "success")
         return redirect(url_for('auth.login'))
 
-    return render_template('reset_password.html', email=email)
+    return render_template('reset_password_form.html', email=email)
 
