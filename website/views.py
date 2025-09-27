@@ -249,20 +249,27 @@ def settings():
 
 
 @views.route('/admin')
+@login_required
 def admin_main():
+    if not current_user.is_admin:
+        flash("Access denied", "error")
+        return redirect(url_for('auth.login'))
     return render_template('main_admin.html')
 
 @views.route('/admin/users')
+@login_required
 def admin_users():
     users = User.query.order_by(User.name).all()
     return render_template('admin_users.html', users=users)
 
 @views.route('/admin/posts')
+@login_required
 def admin_posts():
     items = Item.query.order_by(Item.created_at.desc()).all()
     return render_template('admin_posts.html', posts=items)
 
 @views.route('/admin/delete_user/<int:user_id>', methods=['POST'])
+@login_required
 def admin_delete_user(user_id):
     user = User.query.get_or_404(user_id)
     try:
@@ -291,6 +298,7 @@ def admin_delete_user(user_id):
     return redirect(url_for('views.admin_users'))
 
 @views.route('/admin/delete_post/<int:item_id>', methods=['POST'])
+@login_required
 def admin_delete_post(item_id):
     item = Item.query.get_or_404(item_id)
     try:

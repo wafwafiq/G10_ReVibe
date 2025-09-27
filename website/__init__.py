@@ -55,3 +55,21 @@ def create_app():
 
 
     return app
+def create_admin():#defined admin account
+    from .models import User
+    admin_email = "admin@revibe.com"
+    admin_password = "admin123"
+    admin_name = "Administrator"
+
+    existing_admin = User.query.filter_by(email=admin_email).first()
+    if not existing_admin:
+         admin = User(
+            name=admin_name,
+            email=admin_email,
+            password=admin_password,
+            confirmed=True,    # skip email verification
+            is_admin=True
+        )
+         db.session.add(admin)
+         db.session.commit()
+        
