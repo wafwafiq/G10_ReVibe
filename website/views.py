@@ -281,7 +281,6 @@ def admin_delete_user(user_id):
                 db.session.delete(conversation)
             db.session.delete(item)
         
-
         conversations = Conversation.query.filter(
             (Conversation.user1_id == user_id) | (Conversation.user2_id == user_id)
         ).all()

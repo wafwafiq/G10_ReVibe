@@ -120,23 +120,24 @@ var campusLocations = {
 
 // === Map setup ===
 var map = L.map('map', {
-    center: [2.927673, 101.641924],
-    zoom: 18,
-    zoomControl: true
+    center: [2.927445, 101.641645],
+    zoom: 16,
+    zoomControl: true,
+    minZoom: 15,
+    maxZoom: 19,
+    maxBounds: [
+        [2.922, 101.638], // Southwest corner
+        [2.933, 101.648]  // Northeast corner
+    ],
+    maxBoundsViscosity: 1.0 // "rubber band" effect (1.0 = strict lock)
 });
-var bounds = [
-    [2.9255, 101.6395],
-    [2.9298, 101.6440]
-];
-map.setMaxBounds(bounds);
-map.on('drag', function () {
-    map.panInsideBounds(bounds, { animate: true });
-});
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 17,
-    minZoom: 16,
+    maxZoom: 19,   
+    minZoom: 15,   
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
+
 
 // === Icons ===
 var defaultIcon = L.icon({

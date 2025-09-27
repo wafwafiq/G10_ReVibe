@@ -6,6 +6,8 @@ from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
 from datetime import datetime
 import smtplib
+import random
+from datetime import datetime, timedelta
 
 auth = Blueprint('auth', __name__)
 
@@ -152,24 +154,46 @@ def reset_request():
         email = request.form.get('email')
         user = User.query.filter_by(email=email).first()
         if user:
-            token = generate_token(user.email, salt="password-reset")
-            reset_url = url_for('auth.reset_token', token=token, _external=True)
-            html = f"<p>Hello {user.name},</p><p>Click <a href='{reset_url}'>here</a> to reset your password.</p>"
-            send_email("Reset Your Password", [user.email], body="Click the link to reset your password", html=html)
-            flash("Password reset email sent! Check your inbox.", "info")
-            return redirect(url_for('auth.login'))
+            # Generate OTP
+            otp = str(random.randint(100000, 999999))
+            user.otp_code = otp
+            user.otp_expires_at = datetime.utcnow() + timedelta(minutes=10)
+            db.session.commit()
+
+            # Send email
+            html = f"<p>Hello {user.name},</p><p>Your OTP code is <b>{otp}</b>. It expires in 10 minutes.</p>"
+            send_email("Reset Your Password (OTP)", [user.email], body=f"Your OTP is {otp}", html=html)
+
+            flash("OTP has been sent to your email. Enter it below.", "info")
+            return redirect(url_for('auth.verify_otp', email=email))
         else:
             flash("No account found with that email.", "error")
     return render_template('reset_request.html')
 
-# --- Reset form ---
-@auth.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_token(token):
-    email = verify_token(token, salt="password-reset")
-    if not email:
-        flash("The reset link is invalid or expired.", "error")
+
+#verify OTP
+@auth.route('/reset_password/verify/<email>', methods=['GET', 'POST'])
+def verify_otp(email):
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        flash("Invalid email.", "error")
         return redirect(url_for('auth.reset_request'))
 
+    if request.method == 'POST':
+        otp = request.form.get('otp')
+
+        # Validate OTP
+        if user.otp_code != otp or not user.otp_expires_at or datetime.utcnow() > user.otp_expires_at:
+            flash("Invalid or expired OTP.", "error")
+            return redirect(url_for('auth.verify_otp', email=email))
+
+        # OTP is valid → redirect to reset password form
+        return redirect(url_for('auth.reset_password_form', email=email))
+
+    return render_template('verify_otp.html', email=email)
+
+@auth.route('/reset_password/form/<email>', methods=['GET', 'POST'])
+def reset_password_form(email):
     user = User.query.filter_by(email=email).first()
     if not user:
         flash("User not found.", "error")
@@ -181,11 +205,16 @@ def reset_token(token):
 
         if password != confirm:
             flash("Passwords do not match!", "error")
-            return redirect(url_for('auth.reset_token', token=token))
+            return redirect(url_for('auth.reset_password_form', email=email))
 
-        user.password = password   # stored raw
+        # Save new password
+        user.password = password  # ⚠️ hash in production
+        user.otp_code = None
+        user.otp_expires_at = None
         db.session.commit()
+
         flash("Password has been reset. You can now log in.", "success")
         return redirect(url_for('auth.login'))
 
-    return render_template('reset_password.html')
+    return render_template('reset_password.html', email=email)
+
