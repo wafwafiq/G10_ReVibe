@@ -353,12 +353,3 @@ def handle_message(data):
     except Exception as e:
         print(f"Error in handle_message: {e}")
         socketio.emit('error', {'message': 'Failed to send message'}, room=request.sid)
-
-# Route to serve uploaded files (fixes cloud deployment image issue)
-@views.route('/uploads/<filename>')
-def uploaded_file(filename):
-    """Serve uploaded files from the uploads directory"""
-    # Security: prevent directory traversal
-    if '..' in filename or '/' in filename or '\\' in filename:
-        return "Invalid filename", 400
-    return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
