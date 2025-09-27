@@ -2,45 +2,53 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_socketio import SocketIO
-from flask_mail import Mail
 import os
 from dotenv import load_dotenv
+
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
+
 load_dotenv()  # Load variables from .env into environment
+
 db = SQLAlchemy()
 login_manager = LoginManager()
 socketio = SocketIO()
-mail = Mail()
 
-def create_app(): 
+
+def create_app():
     app = Flask(__name__)
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:AMwyeRlQEsnViGvcDPiUITbFeuAXaAlv@turntable.proxy.rlwy.net:47657/railway'
+    # Database config (Railway MySQL in this case)
+    app.config['SQLALCHEMY_DATABASE_URI'] = (
+        'mysql+pymysql://root:AMwyeRlQEsnViGvcDPiUITbFeuAXaAlv'
+        '@turntable.proxy.rlwy.net:47657/railway'
+    )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    
-    # Use Railway volume in production, local folder in development
+
+    # File upload handling
     if os.path.exists('/app'):  # Railway environment
         app.config['UPLOAD_FOLDER'] = '/app/uploads'
     else:  # Local development
         app.config['UPLOAD_FOLDER'] = os.path.join('website', 'static', 'uploads')
-    
+
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    app.secret_key = "your_secret_key"
 
-    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
-    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
-    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
-    app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL', 'False') == 'True'
-    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-    app.config['MAIL_DEFAULT_SENDER'] = (
-        os.getenv('MAIL_SENDER_NAME'),
-        os.getenv('MAIL_SENDER_EMAIL')
-    )
-    app.config['MAIL_DEBUG'] = os.getenv('MAIL_DEBUG', 'False') == 'True'
+    app.secret_key = os.getenv("SECRET_KEY", "fallback_secret")
 
+    # ----------------------------
+    # ✅ Brevo API configuration
+    # ----------------------------
+    brevo_key = os.getenv("BREVO_API_KEY")
+    if not brevo_key:
+        raise RuntimeError("❌ BREVO_API_KEY not set in .env")
+
+    # Store the Brevo client on the Flask app object
+    app.brevo_client = sib_api_v3_sdk.ApiClient(configuration)
+    app.brevo_api = sib_api_v3_sdk.TransactionalEmailsApi(app.brevo_client)
+
+    # Initialize extensions
     db.init_app(app)
-    mail.init_app(app)
     socketio.init_app(app, cors_allowed_origins="*")
 
     login_manager.login_view = 'auth.login'
@@ -50,17 +58,19 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(user_id)  
-    
+        return User.query.get(user_id)
+
+    # Blueprints
     from .views import views
     from .auth import auth
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/auth')
 
-
     return app
-def create_admin():#defined admin account
+
+
+def create_admin():  # defined admin account
     from .models import User
     admin_email = "admin@revibe.com"
     admin_password = "admin123"
@@ -68,13 +78,12 @@ def create_admin():#defined admin account
 
     existing_admin = User.query.filter_by(email=admin_email).first()
     if not existing_admin:
-         admin = User(
+        admin = User(
             name=admin_name,
             email=admin_email,
             password=admin_password,
             confirmed=True,    # skip email verification
             is_admin=True
         )
-         db.session.add(admin)
-         db.session.commit()
-         
+        db.session.add(admin)
+        db.session.commit()
