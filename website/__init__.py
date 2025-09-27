@@ -16,7 +16,7 @@ def create_app():
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:AMwyeRlQEsnViGvcDPiUITbFeuAXaAlv@turntable.proxy.rlwy.net:47657/railway'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['UPLOAD_FOLDER'] = os.path.join('website', 'static', 'uploads')
+    app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     app.secret_key = "your_secret_key"
