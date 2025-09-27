@@ -60,7 +60,7 @@
                     <!-- Item image placeholder (no image_filename field in database) -->
                     <div class="item-image">
     {% if item.image_filename %}
-        <img src="{{ url_for('views.uploaded_file', filename=item.image_filename) }}" 
+        <img src="{{ url_for('static', filename='uploads/' ~ item.image_filename) }}" 
              alt="{{ item.title }}" class="item-thumbnail">
     {% else %}
         <div class="image-placeholder">📦</div>

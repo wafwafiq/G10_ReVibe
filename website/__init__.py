@@ -3,7 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_socketio import SocketIO
 from flask_mail import Mail
-
+import os
+from dotenv import load_dotenv
+load_dotenv()  # Load variables from .env into environment
 db = SQLAlchemy()
 login_manager = LoginManager()
 socketio = SocketIO()
@@ -12,9 +14,25 @@ mail = Mail()
 def create_app(): 
     app = Flask(__name__)
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:ogezuJ4qNR7Jk9Mb@localhost:3306/revibe'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:AMwyeRlQEsnViGvcDPiUITbFeuAXaAlv@turntable.proxy.rlwy.net:47657/railway'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['UPLOAD_FOLDER'] = os.path.join('website', 'static', 'uploads')
+    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     app.secret_key = "your_secret_key"
+
+    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
+    app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL', 'False') == 'True'
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+    app.config['MAIL_DEFAULT_SENDER'] = (
+        os.getenv('MAIL_SENDER_NAME'),
+        os.getenv('MAIL_SENDER_EMAIL')
+    )
+    app.config['MAIL_DEBUG'] = os.getenv('MAIL_DEBUG', 'False') == 'True'
+
 
     db.init_app(app)
     mail.init_app(app)
